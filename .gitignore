@@ -1,3 +1,7 @@
+.vs
+.idea
 .DS_Store
 node_modules
 cache
+bin
+obj
