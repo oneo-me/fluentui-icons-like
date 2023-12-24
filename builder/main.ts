@@ -14,15 +14,27 @@ export function Main(options: MainOptions) {
   optimizeSvg(icons);
 }
 
+// call svgo to optimize svg icons
 function optimizeSvg(icons: IIcon[]) {
-  // call svgo to optimize svg icons
   icons.forEach((icon) => {
     if (icon instanceof SvgIcon) {
       const svgText = fs.readFileSync(icon.File, "utf8");
       const result = svgo.optimize(svgText);
-      icon.Data = result.data;
+      icon.Data = svgText2Data(result.data);
     }
   });
+}
+
+function svgText2Data(svgText: string): string {
+  const regex = /d="([^"]+)"/g;
+  const matches = svgText.matchAll(regex);
+  const result: string[] = [];
+
+  for (const match of matches) {
+    result.push(match[1]);
+  }
+
+  return result.join(" ");
 }
 
 function loadIcons(assets: string): IIcon[] {

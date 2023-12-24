@@ -24,18 +24,6 @@ export class SvgIcon implements IIcon {
     );
   }
 
-  static SvgText2Data(svgText: string): string {
-    const regex = /d="([^"]+)"/g;
-    const matches = svgText.matchAll(regex);
-    const result: string[] = [];
-
-    for (const match of matches) {
-      result.push(match[1]);
-    }
-
-    return result.join(" ");
-  }
-
   static GetFileType(fileName: string): [string, string] {
     if (fileName.endsWith("_filled")) {
       return ["Filled", fileName.slice(0, -"_filled".length)];
