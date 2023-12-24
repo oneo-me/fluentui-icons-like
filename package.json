@@ -1,0 +1,16 @@
+{
+    "name": "builder",
+    "version": "1.0.0",
+    "description": "icons builder",
+    "main": "build.ts",
+    "scripts": {
+        "start": "ts-node build.ts"
+    },
+    "author": "ONEO",
+    "license": "MIT",
+    "devDependencies": {
+        "@types/node": "^20.10.5",
+        "svgo": "^3.1.0",
+        "ts-node": "^10.9.2"
+    }
+}
