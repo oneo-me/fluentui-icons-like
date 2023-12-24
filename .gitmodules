@@ -1,0 +1,3 @@
+[submodule "submodules/fluentui-system-icons"]
+	path = submodules/fluentui-system-icons
+	url = git@github.com:microsoft/fluentui-system-icons.git
