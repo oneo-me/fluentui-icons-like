@@ -16,10 +16,10 @@ function Main(options) {
   loadFromCustomIcons(icons, options.icons);
 
   // add icons from assets
-  loadFromFulentIcons(icons, options.assets);
+  // loadFromFulentIcons(icons, options.assets);
 
   // optimize icons
-  optimizeIcons(icons);
+  // optimizeIcons(icons);
 
   // sort icons
   icons.sort((a, b) => {
