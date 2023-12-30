@@ -2,15 +2,14 @@
     "name": "builder",
     "version": "1.0.0",
     "description": "icons builder",
-    "main": "build.ts",
+    "type": "module",
+    "main": "build.js",
     "scripts": {
-        "start": "ts-node build.ts"
+        "start": "node build.js"
     },
     "author": "ONEO",
     "license": "MIT",
     "devDependencies": {
-        "@types/node": "^20.10.5",
-        "svgo": "^3.1.0",
-        "ts-node": "^10.9.2"
+        "svgo": "^3.1.0"
     }
 }
