@@ -1,14 +1,10 @@
-import { Icon } from "./icon.js";
+import { Icon, SvgIcon } from "./icon";
 import fs from "fs";
 import path from "path";
 
-/**
- * @param {Icon[]} icons
- * @param {string} folder
- */
-function loadFromCustomIcons(icons, folder) {
+function loadFromCustomIcons(icons: Icon[], folder: string) {
   const fileNames = fs.readdirSync(folder);
-  const size = 32; // custom icons are 32x32
+  const size = 32;
   for (const fileName of fileNames) {
     const file = path.join(folder, fileName);
     const key = path.basename(fileName, path.extname(fileName));
@@ -16,11 +12,7 @@ function loadFromCustomIcons(icons, folder) {
   }
 }
 
-/**
- * @param {Icon[]} icons
- * @param {string} folder
- */
-function loadFromFulentIcons(icons, folder) {
+function loadFromFulentIcons(icons: Icon[], folder: string) {
   const fileNames = fs.readdirSync(folder);
   for (const fileName of fileNames) {
     const svgFolder = path.join(folder, fileName, "SVG");
@@ -30,20 +22,10 @@ function loadFromFulentIcons(icons, folder) {
     icons.push(...loadFromFulentIconFolder(svgFolder));
   }
 }
-/**
- * @param {string} folder
- * @returns {Icon[]}
- */
-function loadFromFulentIconFolder(folder) {
-  /**
-   * @type {Icon[]}
-   */
-  const icons = [];
 
-  /**
-   * @type {{file: string, type: string, key: string, size: number}[]}
-   */
-  const svgs = [];
+function loadFromFulentIconFolder(folder: string): Icon[] {
+  const icons: Icon[] = [];
+  const svgs: SvgIcon[] = [];
 
   const folderName = path.basename(path.dirname(folder));
   const fileNames = fs.readdirSync(folder);
@@ -64,7 +46,7 @@ function loadFromFulentIconFolder(folder) {
     });
   }
 
-  const grouped = {};
+  const grouped: { [key: string]: SvgIcon[] } = {};
   for (const svg of svgs) {
     if (grouped[svg.type] === undefined) {
       grouped[svg.type] = [];
@@ -73,7 +55,7 @@ function loadFromFulentIconFolder(folder) {
   }
 
   for (const key of Object.keys(grouped)) {
-    let closestSizeIcon = undefined;
+    let closestSizeIcon: SvgIcon | undefined = undefined;
     let closestSizeDiff = Infinity;
     for (const svg of grouped[key]) {
       const diff = Math.abs(svg.size - 20);
@@ -92,11 +74,7 @@ function loadFromFulentIconFolder(folder) {
   return icons;
 }
 
-/**
- * @param {string} fileName
- * @returns {{type: string, name: string}}}
- */
-function GetSvgType(fileName) {
+function GetSvgType(fileName: string): { type: string; name: string } {
   if (fileName.endsWith("_filled_ltr.svg")) {
     return { type: "FilledLTR", name: fileName.slice(0, -"_filled_ltr.svg".length) };
   }

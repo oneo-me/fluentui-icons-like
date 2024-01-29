@@ -1,11 +1,8 @@
-import { Icon } from "./icon.js";
+import { Icon } from "./icon";
 import svgo from "svgo";
 import fs from "fs";
 
-/**
- * @param {Icon[]} icons
- */
-function optimizeIcons(icons) {
+function optimizeIcons(icons: Icon[]): void {
   for (const icon of icons) {
     const svgText = fs.readFileSync(icon.file, "utf8");
     const optimizedData = svgo.optimize(svgText).data;
@@ -13,17 +10,10 @@ function optimizeIcons(icons) {
   }
 }
 
-/**
- * @param {string} svgText
- * @returns {string}
- */
-function getSvgData(svgText) {
+function getSvgData(svgText: string): string {
   const regex = /d="([^"]+)"/g;
   const matches = svgText.matchAll(regex);
-  /**
-   * @type {string[]}
-   */
-  const result = [];
+  const result: string[] = [];
   for (const match of matches) {
     result.push(match[1]);
   }
