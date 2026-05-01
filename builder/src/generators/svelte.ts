@@ -40,36 +40,30 @@ export const svelteGenerator: Generator = {
     const sourceData = JSON.stringify(sourcesBySize, null, 2);
     const escapedTitle = escapeXml(icon.name);
 
-    return `<script>
-  /**
-   * @typedef {{ viewBox: string; innerContent: string }} IconSourceData
-   */
+    return `<script lang="ts">
+  import type { SVGAttributes } from 'svelte/elements';
 
-  /**
-   * @type {Record<number, Record<string, IconSourceData>>}
-   */
-  const paths = ${sourceData};
+  type IconSourceData = { viewBox: string; innerContent: string };
+
+  const paths: Record<number, Record<string, IconSourceData>> = ${sourceData};
   const defaultSize = ${defaultSize};
   const defaultStyle = '${defaultStyle}';
 
-  /**
-   * @typedef {${sizeType}} IconAssetSize
-   * @typedef {${styleType}} IconStyle
-   */
+  type IconAssetSize = ${sizeType};
+  type IconStyle = ${styleType};
 
-  /**
-   * @type {Omit<import('svelte/elements').SVGAttributes<SVGSVGElement>, 'style' | 'title'> & {
-   *   size?: IconAssetSize | number;
-   *   style?: string;
-   *   title?: string | null;
-   * }}
-   */
+  type IconProps = Omit<SVGAttributes<SVGSVGElement>, 'style' | 'title'> & {
+    size?: IconAssetSize | number;
+    style?: IconStyle | string;
+    title?: string | null;
+  };
+
   let {
     size = defaultSize,
     style = defaultStyle,
     title = '${escapedTitle}',
     ...others
-  } = $props();
+  }: IconProps = $props();
 
   const source = $derived(
     paths[size]?.[style] ??
