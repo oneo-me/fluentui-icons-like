@@ -43,21 +43,30 @@
   class="flex min-h-0 flex-col overflow-hidden border-r border-[#18211e1f] bg-[#fbfcf7]/75 p-2.5 max-[760px]:grid max-[760px]:grid-cols-2 max-[760px]:gap-2.5 max-[760px]:overflow-y-auto max-[760px]:border-r-0 max-[760px]:border-b"
   aria-label="Icon filters">
   <div
-    class="mb-3 flex min-h-10 min-w-[172px] items-center gap-2 border-b border-[#18211e1a] pb-2.5 max-[760px]:col-span-full max-[760px]:mb-0 max-[760px]:min-w-0">
-    <span
-      class="grid size-[30px] place-items-center border border-[#123f38] bg-[#123f38] font-serif text-lg font-bold text-[#f7f4df]">
-      F
-    </span>
-    <div>
-      <h1 class="m-0 font-serif text-[17px] leading-[1.05] text-[#18211e]">
-        FluentUI Icons Like
-      </h1>
+    class="mb-3 grid min-w-[172px] gap-2 border-b border-[#18211e1a] pb-2.5 max-[760px]:col-span-full max-[760px]:mb-0 max-[760px]:min-w-0">
+    <div class="flex min-h-10 items-center gap-2">
       <span
-        class="mt-0.5 block text-[11px] leading-tight font-bold text-[#66706a]">
-        {iconCount.toLocaleString()}
-        icons
+        class="grid size-[30px] place-items-center border border-[#123f38] bg-[#123f38] font-serif text-lg font-bold text-[#f7f4df]">
+        F
       </span>
+      <div>
+        <h1 class="m-0 font-serif text-[17px] leading-[1.05] text-[#18211e]">
+          FluentUI Icons Like
+        </h1>
+        <span
+          class="mt-0.5 block text-[11px] leading-tight font-bold text-[#66706a]">
+          {iconCount.toLocaleString()}
+          icons
+        </span>
+      </div>
     </div>
+    <a
+      class="inline-flex h-8 w-full cursor-pointer items-center justify-center gap-1.5 rounded-md border border-[#0f6c61] bg-[#123f38] px-2 text-[11px] font-extrabold text-[#f7f4df] shadow-[0_1px_0_rgba(24,33,30,0.08)] transition-colors hover:bg-[#0f6c61] focus:outline-none focus:ring-3 focus:ring-[#0f6c6124]"
+      href="https://github.com/oneo-me/fluentui-icons-like"
+      target="_blank"
+      rel="noreferrer">
+      <span>Getting started</span>
+    </a>
   </div>
 
   <section class="min-h-0 pb-3 max-[760px]:p-0">
