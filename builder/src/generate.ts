@@ -5,8 +5,6 @@ const ROOT_DIR = resolve(import.meta.dirname, "..", "..");
 const ASSETS_DIR = resolve(ROOT_DIR, ".cache", "source", "assets");
 const OUTPUT_DIR = resolve(ROOT_DIR, "packages", "svelte");
 const LIB_DIR = path.join(OUTPUT_DIR, "src", "lib");
-const DEBUG_ICON_LIMIT = 1000000;
-const isProductionBuild = process.env.NODE_ENV === "production";
 
 const SIZE_PRIORITY = [20, 24, 16, 28, 32, 48, 12];
 
@@ -274,11 +272,6 @@ function writeIconFiles(icons: IconDefinition[], iconsDir: string): string[] {
 
 export function generate(): void {
 	console.log("Generating Svelte icon components...");
-	if (!isProductionBuild) {
-		console.log(
-			`Debug mode: limiting output to ${DEBUG_ICON_LIMIT} icon components`,
-		);
-	}
 
 	const iconDirs = fs
 		.readdirSync(ASSETS_DIR, { withFileTypes: true })
@@ -342,10 +335,6 @@ export function generate(): void {
 			metaphor: meta.metaphor ?? [],
 			sources,
 		});
-
-		if (!isProductionBuild && icons.length >= DEBUG_ICON_LIMIT) {
-			break;
-		}
 	}
 
 	console.log(`Found ${icons.length} icons`);
