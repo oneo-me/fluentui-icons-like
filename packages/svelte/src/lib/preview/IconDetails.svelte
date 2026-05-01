@@ -16,28 +16,32 @@
 </script>
 
 <aside
-  class="overflow-y-auto border-l border-[#18211e1f] bg-[#fbfcf7]/75 px-2 py-2.5 max-[1120px]:hidden"
+  class="overflow-y-auto border-l border-[#18211e1f] bg-[#fbfcf7]/75 px-2 py-3 max-[1120px]:hidden"
   aria-label="Selected icon details">
   {#if selectedIcon}
     {@const DetailComp = selectedIcon.value}
     <div
-      class="mb-2.5 flex min-h-10 items-center border-b border-[#18211e1a] pb-2.5">
+      class="mb-3 flex min-h-10 items-center border-b border-[#18211e1a] pb-3">
       <h2
-        class="m-0 overflow-hidden truncate font-serif text-[17px] leading-[1.05] text-[#18211e]">
+        class="m-0 overflow-hidden truncate font-serif text-[16px] leading-[1.05] text-[#18211e]">
         {selectedIcon.name}
       </h2>
     </div>
 
-    <div
-      class="grid aspect-square w-full place-items-center rounded-lg border border-[#d6dcd2] bg-[linear-gradient(90deg,rgba(15,108,97,0.08)_1px,transparent_1px),linear-gradient(rgba(15,108,97,0.08)_1px,transparent_1px)] bg-white text-[#123f38] [background-position:4px_4px] [background-size:16px_16px]">
-      <DetailComp
-        class="bg-[#d6dcd24a]"
-        size={120}
-        style={selectedStyle}
-        title={selectedIcon.name} />
-    </div>
-
     <dl class="m-0 grid">
+      <div
+        class="grid grid-cols-[64px_minmax(0,1fr)] items-center gap-2 border-b border-[#18211e1a] py-2">
+        <dt class="text-[11px] font-extrabold text-[#66706a]">Preview</dt>
+        <dd class="m-0 min-w-0">
+          <div
+            class="grid aspect-square w-full place-items-center rounded-lg border border-[#d6dcd2] bg-[linear-gradient(90deg,rgba(15,108,97,0.08)_1px,transparent_1px),linear-gradient(rgba(15,108,97,0.08)_1px,transparent_1px)] bg-white text-[#123f38] [background-position:4px_4px] [background-size:16px_16px]">
+            <DetailComp
+              size={120}
+              style={selectedStyle}
+              title={selectedIcon.name} />
+          </div>
+        </dd>
+      </div>
       <div
         class="grid grid-cols-[64px_minmax(0,1fr)] items-center gap-2 border-b border-[#18211e1a] py-2">
         <dt class="text-[11px] font-extrabold text-[#66706a]">Key</dt>
