@@ -1,5 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
   import { type IconEntry, type IconStyle, registry } from '$lib/index.js';
   import FilterSidebar from '$lib/preview/FilterSidebar.svelte';
   import IconCatalog from '$lib/preview/IconCatalog.svelte';
@@ -8,6 +10,36 @@
   const GAP = 6;
   const PADDING = 10;
   const OVERSCAN = 3;
+
+  const VALID_STYLES = new Set<IconStyle>(['Filled', 'Light', 'Regular']);
+
+  function readParams(url: URL): {
+    keyword: string;
+    size: number;
+    style: IconStyle;
+    metaphor: string;
+    iconKey: string;
+  } {
+    const p = url.searchParams;
+    const style = p.get('style') ?? '';
+    return {
+      keyword: p.get('q') ?? '',
+      size: Number(p.get('size')) || 20,
+      style: VALID_STYLES.has(style as IconStyle) ? (style as IconStyle) : 'Regular',
+      metaphor: p.get('metaphor') ?? '',
+      iconKey: p.get('icon') ?? '',
+    };
+  }
+
+  function buildParams(): URLSearchParams {
+    const p = new URLSearchParams();
+    if (keyword) p.set('q', keyword);
+    if (selectedSize !== 20) p.set('size', String(selectedSize));
+    if (selectedStyle !== 'Regular') p.set('style', selectedStyle);
+    if (selectedMetaphor) p.set('metaphor', selectedMetaphor);
+    if (selectedIcon) p.set('icon', selectedIcon.key);
+    return p;
+  }
 
   let source = $state<IconEntry[]>([]);
   let keyword = $state('');
@@ -22,6 +54,8 @@
   let containerWidth = $state(900);
   let containerHeight = $state(620);
   let scrollTopRaw = $state(0);
+
+  let urlSyncReady = $state(false);
 
   let allSizes = $derived(
     Array.from(new Set(source.flatMap((icon) => icon.sizes))).sort(
@@ -155,7 +189,34 @@
 
   onMount(() => {
     source = registry;
-    selectedIcon = registry[0] ?? null;
+
+    const params = readParams($page.url);
+    keyword = params.keyword;
+    selectedSize = params.size;
+    selectedStyle = params.style;
+    selectedMetaphor = params.metaphor;
+
+    if (params.iconKey) {
+      selectedIcon = registry.find((icon) => icon.key === params.iconKey) ?? null;
+    }
+    if (!selectedIcon) {
+      selectedIcon = registry[0] ?? null;
+    }
+
+    urlSyncReady = true;
+  });
+
+  $effect(() => {
+    if (!urlSyncReady || !source.length) return;
+
+    const params = buildParams();
+    const qs = params.toString();
+    const currentQs = $page.url.searchParams.toString();
+    if (qs === currentQs) return;
+
+    const newUrl = new URL($page.url);
+    newUrl.search = qs ? `?${qs}` : '';
+    goto(newUrl, { replaceState: true, noScroll: true, keepFocus: true });
   });
 
   $effect(() => {
