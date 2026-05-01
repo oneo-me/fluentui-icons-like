@@ -255,7 +255,14 @@
   });
 </script>
 
-<svelte:head> <title>Fluent UI Icons Preview</title> </svelte:head>
+<svelte:head>
+  <title>FluentUI Icons Like — Svelte Icon Components</title>
+  <meta name="description" content="Browse, search, and copy over 2,000+ SVG icon components for Svelte — based on Microsoft Fluent UI System Icons. Supports Regular, Filled, and Light styles in multiple sizes." />
+  <meta property="og:title" content="FluentUI Icons Like — Svelte Icon Components" />
+  <meta property="og:description" content="Browse, search, and copy over 2,000+ SVG icon components for Svelte — based on Microsoft Fluent UI System Icons." />
+  <meta name="twitter:title" content="FluentUI Icons Like — Svelte Icon Components" />
+  <meta name="twitter:description" content="Browse, search, and copy over 2,000+ SVG icon components for Svelte — based on Microsoft Fluent UI System Icons." />
+</svelte:head>
 
 <div class="h-screen overflow-hidden bg-[#eef0ea] font-sans text-[#18211e]">
   <div

@@ -50,7 +50,7 @@
     </span>
     <div>
       <h1 class="m-0 font-serif text-[17px] leading-[1.05] text-[#18211e]">
-        Fluent UI Icons
+        FluentUI Icons Like
       </h1>
       <span
         class="mt-0.5 block text-[11px] leading-tight font-bold text-[#66706a]">
