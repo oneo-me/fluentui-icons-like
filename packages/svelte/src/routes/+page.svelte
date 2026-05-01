@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import CopyIcon from '$lib/icons/Copy.svelte';
   import { type IconEntry, type IconStyle, registry } from '$lib/index.js';
 
   const GAP = 6;
@@ -46,7 +47,8 @@
       metaphor.toLowerCase().includes(metaphorKeyword.trim().toLowerCase()),
     ),
   );
-  let filtered = $derived(source.filter(matchesFilters));
+  let leftFiltered = $derived(source.filter(matchesLeftFilters));
+  let filtered = $derived(leftFiltered.filter(matchesSearch));
   let gridWidth = $derived(Math.max(0, containerWidth));
   let baseItemSize = $derived(Math.max(36, selectedSize + 24));
 
@@ -91,18 +93,22 @@
       .toLowerCase();
   }
 
-  function matchesFilters(icon: IconEntry) {
+  function matchesSearch(icon: IconEntry) {
     const terms = keyword.trim().toLowerCase().split(/\s+/).filter(Boolean);
 
-    const matchesSearch =
+    return (
       terms.length === 0 ||
-      terms.every((term) => getSearchText(icon).includes(term));
+      terms.every((term) => getSearchText(icon).includes(term))
+    );
+  }
+
+  function matchesLeftFilters(icon: IconEntry) {
     const matchesSize = icon.sizes.includes(selectedSize);
     const matchesStyle = icon.styles.includes(selectedStyle);
     const matchesMetaphor =
       selectedMetaphor === '' || getMetaphors(icon).includes(selectedMetaphor);
 
-    return matchesSearch && matchesSize && matchesStyle && matchesMetaphor;
+    return matchesSize && matchesStyle && matchesMetaphor;
   }
 
   function resetScroll() {
@@ -195,6 +201,7 @@
         <span class="brand-mark">F</span>
         <div>
           <h1>Fluent UI Icons</h1>
+          <span>{source.length.toLocaleString()} icons</span>
         </div>
       </div>
 
@@ -263,8 +270,17 @@
       </section>
 
       <div class="sidebar-footer">
-        <strong>Fluent UI Icons Preview</strong>
-        <span>Icons copyright Microsoft Corporation.</span>
+        <span>
+          This project was created by
+          <a href="https://oneo.me" target="_blank" rel="noreferrer">ONEO</a>
+          using
+          <a
+            href="https://github.com/microsoft/fluentui-system-icons"
+            target="_blank"
+            rel="noreferrer"
+            >fluentui-system-icons</a
+          >
+        </span>
       </div>
     </aside>
 
@@ -274,7 +290,7 @@
           <input
             type="search"
             bind:value={keyword}
-            placeholder={`Searching metadata from ${source.length.toLocaleString()} icons…`} />
+            placeholder={`Searching metadata from ${leftFiltered.length.toLocaleString()} icons...`} />
         </label>
       </div>
 
@@ -313,6 +329,10 @@
     <aside class="details" aria-label="Selected icon details">
       {#if selectedIcon}
         {@const DetailComp = selectedIcon.value}
+        <div class="detail-title">
+          <h2>{selectedIcon.name}</h2>
+        </div>
+
         <div class="detail-preview">
           <DetailComp
             size={120}
@@ -320,17 +340,20 @@
             title={selectedIcon.name} />
         </div>
 
-        <div class="detail-title">
-          <h2>{selectedIcon.name}</h2>
-          <button type="button" class="copy-button" onclick={copySelectedKey}>
-            {copiedKey === selectedIcon.key ? 'Copied' : 'Copy key'}
-          </button>
-        </div>
-
         <dl class="detail-list">
           <div>
             <dt>Key</dt>
-            <dd>{selectedIcon.key}</dd>
+            <dd class="key-value">
+              <span>{selectedIcon.key}</span>
+              <button
+                type="button"
+                class="copy-button"
+                aria-label="Copy key"
+                title={copiedKey === selectedIcon.key ? 'Copied' : 'Copy key'}
+                onclick={copySelectedKey}>
+                <CopyIcon size={16} style={selectedStyle} title={null} />
+              </button>
+            </dd>
           </div>
           <div>
             <dt>Keyword</dt>
@@ -444,6 +467,15 @@
     letter-spacing: 0;
   }
 
+  .brand span:not(.brand-mark) {
+    display: block;
+    margin-top: 2px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
   .search {
     position: relative;
     display: block;
@@ -530,9 +562,14 @@
     line-height: 1.35;
   }
 
-  .sidebar-footer strong {
+  .sidebar-footer a {
     color: var(--accent-ink);
-    font-size: 12px;
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .sidebar-footer a:hover {
+    text-decoration: underline;
   }
 
   .section-title {
@@ -727,7 +764,26 @@
 
   .details {
     border-left: 1px solid rgba(24, 33, 30, 0.12);
-    padding: 8px;
+    padding: 10px 8px 8px;
+  }
+
+  .detail-title {
+    display: flex;
+    align-items: center;
+    min-height: 42px;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(24, 33, 30, 0.1);
+  }
+
+  .detail-title h2 {
+    overflow: hidden;
+    color: var(--ink);
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 17px;
+    line-height: 1.05;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .detail-preview {
@@ -740,37 +796,37 @@
     background:
       linear-gradient(90deg, rgba(15, 108, 97, 0.08) 1px, transparent 1px),
       linear-gradient(rgba(15, 108, 97, 0.08) 1px, transparent 1px), #ffffff;
+    background-position: 4px 4px;
     background-size: 16px 16px;
     color: #123f38;
   }
 
-  .detail-title {
-    display: grid;
-    gap: 8px;
-    margin: 8px 0;
-  }
-
-  .detail-title h2 {
-    font-family: Georgia, 'Times New Roman', serif;
-    font-size: 18px;
-    line-height: 1.05;
-  }
-
   .copy-button {
-    width: 88px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 28px;
+    padding: 0;
+    border-color: transparent;
+    background: transparent;
     font-size: 11px;
     font-weight: 800;
+  }
+
+  .copy-button svg {
+    flex: 0 0 auto;
   }
 
   .detail-list {
     display: grid;
     gap: 0;
     margin: 0;
-    border-top: 1px solid rgba(24, 33, 30, 0.1);
   }
 
   .detail-list div {
     display: grid;
+    align-items: center;
     grid-template-columns: 64px minmax(0, 1fr);
     gap: 8px;
     padding: 7px 0;
@@ -790,6 +846,19 @@
     overflow-wrap: anywhere;
     font-size: 12px;
     line-height: 1.45;
+  }
+
+  .detail-list .key-value {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    line-height: 28px;
+  }
+
+  .key-value > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .token-block {
