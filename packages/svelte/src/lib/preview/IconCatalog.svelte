@@ -80,18 +80,16 @@
       <div
         class="absolute top-0 right-2.5 left-2.5 grid content-start gap-1.5 will-change-transform"
         style="grid-template-columns: repeat({columnsPerRow}, minmax(0, 1fr)); transform: translateY({itemsTop + padding}px)">
-        {#each visibleIcons as icon}
-          {#key icon.key}
-            {@const Comp = icon.value}
-            <button
-              type="button"
-              class={iconClass(icon)}
-              style="height: {itemSize}px"
-              title={icon.description || icon.name}
-              onclick={() => onSelectIcon(icon)}>
-              <Comp size={selectedSize} style={selectedStyle} />
-            </button>
-          {/key}
+        {#each visibleIcons as icon (icon.key)}
+          {@const Comp = icon.value}
+          <button
+            type="button"
+            class={iconClass(icon)}
+            style="height: {itemSize}px"
+            title={icon.description || icon.name}
+            onclick={() => onSelectIcon(icon)}>
+            <Comp size={selectedSize} style={selectedStyle} />
+          </button>
         {/each}
       </div>
     {/if}

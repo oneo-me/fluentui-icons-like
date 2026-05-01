@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import { page } from '$app/stores';
   import { goto } from '$app/navigation';
+  import { page } from '$app/stores';
   import { type IconEntry, type IconStyle, registry } from '$lib/index.js';
   import FilterSidebar from '$lib/preview/FilterSidebar.svelte';
   import IconCatalog from '$lib/preview/IconCatalog.svelte';
@@ -9,7 +9,8 @@
 
   const GAP = 6;
   const PADDING = 10;
-  const OVERSCAN = 3;
+  const MIN_OVERSCAN_ROWS = 8;
+  const MAX_OVERSCAN_ROWS = 24;
 
   const VALID_STYLES = new Set<IconStyle>(['Filled', 'Light', 'Regular']);
 
@@ -25,7 +26,9 @@
     return {
       keyword: p.get('q') ?? '',
       size: Number(p.get('size')) || 20,
-      style: VALID_STYLES.has(style as IconStyle) ? (style as IconStyle) : 'Regular',
+      style: VALID_STYLES.has(style as IconStyle)
+        ? (style as IconStyle)
+        : 'Regular',
       metaphor: p.get('metaphor') ?? '',
       iconKey: p.get('icon') ?? '',
     };
@@ -52,7 +55,7 @@
   let gridEl = $state<HTMLDivElement | null>(null);
   let containerWidth = $state(900);
   let containerHeight = $state(620);
-  let scrollTopRaw = $state(0);
+  let scrollRow = $state(0);
 
   let urlSyncReady = $state(false);
 
@@ -95,12 +98,15 @@
   );
   let rowHeight = $derived(itemSize + GAP);
   let totalRows = $derived(Math.ceil(filtered.length / columnsPerRow));
-  let startRow = $derived(
-    Math.max(0, Math.floor(scrollTopRaw / rowHeight) - OVERSCAN),
+  let viewportRows = $derived(Math.ceil(containerHeight / rowHeight));
+  let overscanRows = $derived(
+    Math.max(
+      MIN_OVERSCAN_ROWS,
+      Math.min(MAX_OVERSCAN_ROWS, Math.ceil(viewportRows * 0.75)),
+    ),
   );
-  let visibleRows = $derived(
-    Math.ceil(containerHeight / rowHeight) + OVERSCAN * 2 + 1,
-  );
+  let startRow = $derived(Math.max(0, scrollRow - overscanRows));
+  let visibleRows = $derived(viewportRows + overscanRows * 2 + 1);
   let startIndex = $derived(startRow * columnsPerRow);
   let endIndex = $derived(
     Math.min(filtered.length, (startRow + visibleRows) * columnsPerRow),
@@ -147,7 +153,7 @@
   }
 
   function resetScroll() {
-    scrollTopRaw = 0;
+    scrollRow = 0;
     if (gridEl) gridEl.scrollTop = 0;
   }
 
@@ -171,7 +177,10 @@
   }
 
   function onScroll() {
-    if (gridEl) scrollTopRaw = gridEl.scrollTop;
+    if (!gridEl) return;
+
+    const nextScrollRow = Math.floor(gridEl.scrollTop / rowHeight);
+    if (nextScrollRow !== scrollRow) scrollRow = nextScrollRow;
   }
 
   onMount(() => {
@@ -184,7 +193,8 @@
     selectedMetaphor = params.metaphor;
 
     if (params.iconKey) {
-      selectedIcon = registry.find((icon) => icon.key === params.iconKey) ?? null;
+      selectedIcon =
+        registry.find((icon) => icon.key === params.iconKey) ?? null;
     }
     if (!selectedIcon) {
       selectedIcon = registry[0] ?? null;
@@ -234,6 +244,7 @@
       if (entry) {
         containerWidth = entry.contentRect.width;
         containerHeight = entry.contentRect.height;
+        scrollRow = Math.floor(el.scrollTop / rowHeight);
       }
     });
     ro.observe(el);
@@ -244,14 +255,25 @@
 
 <svelte:head>
   <title>FluentUI Icons Like — Svelte Icon Components</title>
-  <meta name="description" content="Browse, search, and copy over 2,000+ SVG icon components for Svelte — based on Microsoft Fluent UI System Icons. Supports Regular, Filled, and Light styles in multiple sizes." />
-  <meta property="og:title" content="FluentUI Icons Like — Svelte Icon Components" />
-  <meta property="og:description" content="Browse, search, and copy over 2,000+ SVG icon components for Svelte — based on Microsoft Fluent UI System Icons." />
-  <meta name="twitter:title" content="FluentUI Icons Like — Svelte Icon Components" />
-  <meta name="twitter:description" content="Browse, search, and copy over 2,000+ SVG icon components for Svelte — based on Microsoft Fluent UI System Icons." />
+  <meta
+    name="description"
+    content="Browse, search, and copy over 2,000+ SVG icon components for Svelte — based on Microsoft Fluent UI System Icons. Supports Regular, Filled, and Light styles in multiple sizes." />
+  <meta
+    property="og:title"
+    content="FluentUI Icons Like — Svelte Icon Components" />
+  <meta
+    property="og:description"
+    content="Browse, search, and copy over 2,000+ SVG icon components for Svelte — based on Microsoft Fluent UI System Icons." />
+  <meta
+    name="twitter:title"
+    content="FluentUI Icons Like — Svelte Icon Components" />
+  <meta
+    name="twitter:description"
+    content="Browse, search, and copy over 2,000+ SVG icon components for Svelte — based on Microsoft Fluent UI System Icons." />
 </svelte:head>
 
-<div class="h-screen overflow-hidden bg-stone-100 font-sans text-slate-950 dark:bg-zinc-950 dark:text-zinc-100">
+<div
+  class="h-screen overflow-hidden bg-stone-100 font-sans text-slate-950 dark:bg-zinc-950 dark:text-zinc-100">
   <div
     class="grid h-full min-h-0 grid-cols-[236px_minmax(0,1fr)_236px] max-[1120px]:grid-cols-[236px_minmax(0,1fr)] max-[760px]:grid-cols-1">
     <FilterSidebar
@@ -285,8 +307,6 @@
       {onScroll}
       onSelectIcon={selectIcon} />
 
-    <IconDetails
-      {selectedIcon}
-      {selectedStyle} />
+    <IconDetails {selectedIcon} {selectedStyle} />
   </div>
 </div>

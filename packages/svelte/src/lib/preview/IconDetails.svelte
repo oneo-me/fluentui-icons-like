@@ -122,9 +122,7 @@
         <dt class={detailLabel}>Keyword</dt>
         <dd class="m-0 flex min-w-0 flex-wrap gap-1">
           {#each splitKeywords(selectedIcon.keyword) as keyword}
-            <span class={tagClass}>
-              {keyword}
-            </span>
+            <span class={tagClass}> {keyword} </span>
           {/each}
         </dd>
       </div>
@@ -132,9 +130,7 @@
         <dt class={detailLabel}>Metaphors</dt>
         <dd class="m-0 flex min-w-0 flex-wrap gap-1">
           {#each selectedIcon.metaphor as tag}
-            <span class={tagClass}>
-              {tag}
-            </span>
+            <span class={tagClass}> {tag} </span>
           {/each}
         </dd>
       </div>
@@ -142,9 +138,7 @@
         <dt class={detailLabel}>Styles</dt>
         <dd class="m-0 flex min-w-0 flex-wrap gap-1">
           {#each selectedIcon.styles as style}
-            <span class={tagClass}>
-              {style}
-            </span>
+            <span class={tagClass}> {style} </span>
           {/each}
         </dd>
       </div>
@@ -152,9 +146,7 @@
         <dt class={detailLabel}>Sizes</dt>
         <dd class="m-0 flex min-w-0 flex-wrap gap-1">
           {#each selectedIcon.sizes as size}
-            <span class={tagClass}>
-              {size}px
-            </span>
+            <span class={tagClass}> {size}px </span>
           {/each}
         </dd>
       </div>
@@ -162,7 +154,9 @@
   {:else}
     <div
       class="grid min-h-[220px] place-items-center content-center gap-2 text-center text-slate-500 dark:text-zinc-400">
-      <strong class="font-serif text-xl text-slate-950 dark:text-zinc-100">Select an icon</strong>
+      <strong class="font-serif text-xl text-slate-950 dark:text-zinc-100"
+        >Select an icon</strong
+      >
       <span>Details appear here.</span>
     </div>
   {/if}
@@ -207,7 +201,8 @@
 
   @keyframes copy-pop-even {
     0% {
-      box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-teal-500) 34%, transparent);
+      box-shadow: 0 0 0 0
+        color-mix(in oklab, var(--color-teal-500) 34%, transparent);
       transform: scale(1);
     }
     42% {
@@ -222,7 +217,8 @@
 
   @keyframes copy-pop-odd {
     0% {
-      box-shadow: 0 0 0 0 color-mix(in oklab, var(--color-teal-500) 34%, transparent);
+      box-shadow: 0 0 0 0
+        color-mix(in oklab, var(--color-teal-500) 34%, transparent);
       transform: scale(1);
     }
     42% {
@@ -274,7 +270,11 @@
     }
 
     .copy-button[data-copied='true'] {
-      background-color: color-mix(in oklab, var(--color-teal-950) 60%, transparent);
+      background-color: color-mix(
+        in oklab,
+        var(--color-teal-950) 60%,
+        transparent
+      );
       color: var(--color-teal-200);
     }
   }
