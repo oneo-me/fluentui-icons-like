@@ -1,1 +1,17 @@
 @import 'tailwindcss';
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: #eef0ea;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+}
