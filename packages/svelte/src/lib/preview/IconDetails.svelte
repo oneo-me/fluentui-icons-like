@@ -30,7 +30,11 @@
 
     <div
       class="grid aspect-square w-full place-items-center rounded-lg border border-[#d6dcd2] bg-[linear-gradient(90deg,rgba(15,108,97,0.08)_1px,transparent_1px),linear-gradient(rgba(15,108,97,0.08)_1px,transparent_1px)] bg-white text-[#123f38] [background-position:4px_4px] [background-size:16px_16px]">
-      <DetailComp size={120} style={selectedStyle} title={selectedIcon.name} />
+      <DetailComp
+        class="bg-[#d6dcd24a]"
+        size={120}
+        style={selectedStyle}
+        title={selectedIcon.name} />
     </div>
 
     <dl class="m-0 grid">
@@ -46,7 +50,7 @@
             type="button"
             class="inline-flex size-7 flex-none cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent p-0 text-[11px] font-extrabold text-[#18211e] hover:border-[#0f6c61] hover:text-[#073b35]"
             aria-label="Copy key"
-            title={copiedKey === selectedIcon.key ? 'Copied' : 'Copy key'}
+            title={copiedKey === selectedIcon.key ? "Copied" : "Copy key"}
             onclick={onCopySelectedKey}>
             <CopyIcon size={16} style={selectedStyle} title={null} />
           </button>
@@ -65,7 +69,7 @@
         <dt class="text-[11px] font-extrabold text-[#66706a]">Description</dt>
         <dd
           class="m-0 min-w-0 text-xs leading-[1.45] break-words text-[#18211e]">
-          {selectedIcon.description || 'No description'}
+          {selectedIcon.description || "No description"}
         </dd>
       </div>
     </dl>

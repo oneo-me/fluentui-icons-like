@@ -66,9 +66,8 @@
         class="text-[11px] font-extrabold tracking-[0.08em] text-[#66706a] uppercase">
         Size
       </span>
-      <strong class="text-xs text-[#073b35]">{selectedSize}</strong>
     </div>
-    <div class="grid grid-cols-3 gap-1">
+    <div class="grid grid-cols-4 gap-1">
       {#each allSizes as size}
         <button
           type="button"
@@ -87,9 +86,8 @@
         class="text-[11px] font-extrabold tracking-[0.08em] text-[#66706a] uppercase">
         Style
       </span>
-      <strong class="text-xs text-[#073b35]">{selectedStyle}</strong>
     </div>
-    <div class="grid grid-cols-2 gap-1">
+    <div class="grid grid-cols-3 gap-1">
       {#each allStyles as style}
         <button
           type="button"
@@ -108,9 +106,6 @@
         class="text-[11px] font-extrabold tracking-[0.08em] text-[#66706a] uppercase">
         Metaphors
       </span>
-      <strong class="min-w-0 truncate text-xs text-[#073b35]">
-        {selectedMetaphor || 'All'}
-      </strong>
     </div>
     <label class="mb-2 block">
       <input
