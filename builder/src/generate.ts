@@ -1,127 +1,167 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { resolve } from 'node:path';
+import fs from "node:fs";
+import path, { resolve } from "node:path";
 
-const ROOT_DIR = resolve(import.meta.dirname, '..', '..');
-const ASSETS_DIR = resolve(ROOT_DIR, '.cache', 'source', 'assets');
-const OUTPUT_DIR = resolve(ROOT_DIR, 'packages', 'svelte');
+const ROOT_DIR = resolve(import.meta.dirname, "..", "..");
+const ASSETS_DIR = resolve(ROOT_DIR, ".cache", "source", "assets");
+const OUTPUT_DIR = resolve(ROOT_DIR, "packages", "svelte");
+const LIB_DIR = path.join(OUTPUT_DIR, "src", "lib");
+const DEBUG_ICON_LIMIT = 1000000;
+const isProductionBuild = process.env.NODE_ENV === "production";
 
 const SIZE_PRIORITY = [20, 24, 16, 28, 32, 48, 12];
 
 function toSnakeCase(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/\s+/g, '_')
-    .replace(/[^a-z0-9_]/g, '');
+	return name
+		.toLowerCase()
+		.replace(/\s+/g, "_")
+		.replace(/[^a-z0-9_]/g, "");
 }
 
 function toPascalCaseWithUnderscores(name: string): string {
-  return name
-    .split(' ')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join('_');
+	return name
+		.split(" ")
+		.map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+		.join("_");
 }
 
-function extractSvgData(svgContent: string): { viewBox: string; pathData: string } | null {
-  const viewBoxMatch = svgContent.match(/viewBox="([^"]+)"/);
-  const pathMatch = svgContent.match(/<path\s[^>]*\bd="([^"]*)"/);
-  if (!viewBoxMatch || !pathMatch) return null;
-  return { viewBox: viewBoxMatch[1], pathData: pathMatch[1] };
+function escapeXml(value: string): string {
+	return value
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;");
+}
+
+function extractSvgData(
+	svgContent: string,
+): { viewBox: string; pathData: string } | null {
+	const viewBoxMatch = svgContent.match(/viewBox="([^"]+)"/);
+	const pathMatch = svgContent.match(/<path\s[^>]*\bd="([^"]*)"/);
+	if (!viewBoxMatch || !pathMatch) return null;
+	return { viewBox: viewBoxMatch[1], pathData: pathMatch[1] };
 }
 
 function pickBestSize(availableSizes: number[]): number {
-  for (const size of SIZE_PRIORITY) {
-    if (availableSizes.includes(size)) return size;
-  }
-  return availableSizes[0];
+	for (const size of SIZE_PRIORITY) {
+		if (availableSizes.includes(size)) return size;
+	}
+	return availableSizes[0];
 }
 
-function formatPathData(d: string, viewBox: string, defaultSize: number): string {
-  const bounds = viewBox.split(' ').map(Number);
-  const maxX = bounds[2];
-  const maxY = bounds[3];
-  return `${d} M 0 0 M ${maxX} ${maxY}`;
+function formatPathData(d: string, viewBox: string): string {
+	const bounds = viewBox.split(" ").map(Number);
+	const maxX = bounds[2];
+	const maxY = bounds[3];
+	return `${d} M 0 0 M ${maxX} ${maxY}`;
 }
 
 interface IconMeta {
-  name: string;
-  size: number[];
-  style: string[];
-  keyword: string | null;
-  description: string | null;
-  metaphor: string[] | null;
-  directionType?: string | null;
+	name: string;
+	size: number[];
+	style: string[];
+	keyword: string | null;
+	description: string | null;
+	metaphor: string[] | null;
 }
 
-interface IconVariant {
-  name: string;
-  style: string;
-  size: number;
-  viewBox: string;
-  pathData: string;
-  keyword: string;
-  description: string;
-  metaphor: string[];
-  directionType?: string;
+interface IconSource {
+	size: number;
+	style: string;
+	viewBox: string;
+	pathData: string;
 }
 
-function generateIconSvelte(variant: IconVariant): string {
-  const title = `${variant.name}_${variant.style}`;
-  const formattedPath = formatPathData(variant.pathData, variant.viewBox, variant.size);
+interface IconDefinition {
+	key: string;
+	name: string;
+	sizes: number[];
+	styles: string[];
+	keyword: string;
+	description: string;
+	metaphor: string[];
+	sources: IconSource[];
+}
 
-  return `<script>
-  import IconBase from "../components/icon-base.svelte";
+function toTypeUnion(values: Array<number | string>): string {
+	return values
+		.map((value) => (typeof value === "number" ? value : `'${value}'`))
+		.join(" | ");
+}
 
+function generateIconSvelte(icon: IconDefinition): string {
+	const defaultSize = pickBestSize(icon.sizes);
+	const defaultStyle = icon.styles.includes("Regular")
+		? "Regular"
+		: icon.styles[0];
+	const sizeType = toTypeUnion(icon.sizes);
+	const styleType = toTypeUnion(icon.styles);
+	const sourcesBySize = icon.sources.reduce<
+		Record<number, Record<string, { viewBox: string; pathData: string }>>
+	>((acc, source) => {
+		acc[source.size] ??= {};
+		acc[source.size][source.style] = {
+			viewBox: source.viewBox,
+			pathData: formatPathData(source.pathData, source.viewBox),
+		};
+		return acc;
+	}, {});
+	const sourceData = JSON.stringify(sourcesBySize, null, 2);
+	const escapedTitle = escapeXml(icon.name);
+
+	return `<script>
   /**
-   * @type {import('svelte/elements').SVGAttributes<SVGSVGElement> & {
-   *   size?: number;
-   *   class?: string;
-   * }}
+   * @typedef {{ viewBox: string; pathData: string }} IconSourceData
    */
-  let { size, class: className, ...others } = $props();
-</script>
 
-<IconBase
-    title="${title}"
-    viewBox="${variant.viewBox}"
-    data="${formattedPath}"
-    {size}
-    class={className}
-    {...others}
-/>
-`;
-}
-
-function generateIconBaseSvelte(): string {
-  return `<script>
   /**
-   * @type {import('svelte/elements').SVGAttributes<SVGSVGElement> & {
+   * @type {Record<number, Record<string, IconSourceData>>}
+   */
+  const paths = ${sourceData};
+  const defaultSize = ${defaultSize};
+  const defaultStyle = '${defaultStyle}';
+
+  /**
+   * @typedef {${sizeType}} IconAssetSize
+   * @typedef {${styleType}} IconStyle
+   */
+
+  /**
+   * @type {Omit<import('svelte/elements').SVGAttributes<SVGSVGElement>, 'style' | 'title'> & {
+   *   size?: IconAssetSize | number;
+   *   style?: string;
+   *   svgStyle?: string;
    *   title?: string | null;
-   *   data?: string | null;
-   *   size?: number;
-   *   viewBox?: string;
    * }}
    */
   let {
-    title = null,
-    data = null,
-    size = 22,
-    viewBox,
+    size = defaultSize,
+    style = defaultStyle,
+    svgStyle = '',
+    title = '${escapedTitle}',
     ...others
   } = $props();
+
+  const source = $derived(
+    paths[size]?.[style] ??
+      paths[defaultSize]?.[style] ??
+      paths[size]?.[defaultStyle] ??
+      paths[defaultSize]?.[defaultStyle],
+  );
 </script>
 
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  {viewBox}
-  style="width: {size}px; height: {size}px"
-  {...others}
->
-  {#if title}
-    <title>{title}</title>
-  {/if}
-  <path d={data} />
-</svg>
+{#if source}
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox={source.viewBox}
+    style={\`width: \${size}px; height: \${size}px; \${svgStyle}\`}
+    {...others}
+  >
+    {#if title}
+      <title>{title}</title>
+    {/if}
+    <path d={source.pathData} />
+  </svg>
+{/if}
 
 <style>
   svg {
@@ -136,116 +176,189 @@ function generateIconBaseSvelte(): string {
 `;
 }
 
-function generateIconsRegistry(variants: IconVariant[]): string {
-  const imports = variants
-    .map((v) => {
-      const filename = `${toPascalCaseWithUnderscores(v.name)}_${v.style}`;
-      return `import ${filename} from './src/lib/icons/${filename}.svelte';`;
-    })
-    .join('\n');
+function generateLibraryIndex(icons: IconDefinition[]): string {
+	const filenames = icons.map((icon) => icon.key);
+	const sortedFilenames = [...filenames].sort((a, b) => a.localeCompare(b));
+	const iconStyles = Array.from(
+		new Set(icons.flatMap((icon) => icon.styles)),
+	).sort((a, b) => a.localeCompare(b));
 
-  const entries = variants
-    .map((v) => {
-      const filename = `${toPascalCaseWithUnderscores(v.name)}_${v.style}`;
-      return `  { key: '${filename}', value: ${filename} },`;
-    })
-    .join('\n');
+	const imports = sortedFilenames
+		.map((filename) => `import ${filename} from './icons/${filename}.svelte';`)
+		.join("\n");
 
-  return `${imports}
+	const exports = sortedFilenames
+		.map(
+			(filename) =>
+				`export { default as ${filename} } from './icons/${filename}.svelte';`,
+		)
+		.join("\n");
 
-export default [
+	const entries = filenames
+		.map((filename) => {
+			const icon = icons.find((item) => item.key === filename);
+			if (!icon) return "";
+			const metadata = {
+				key: icon.key,
+				name: icon.name,
+				sizes: icon.sizes,
+				styles: icon.styles,
+				keyword: icon.keyword,
+				description: icon.description,
+				metaphor: icon.metaphor,
+			};
+			return `  { ...${JSON.stringify(metadata)}, value: ${filename} },`;
+		})
+		.filter(Boolean)
+		.join("\n");
+
+	return `import type { Component } from 'svelte';
+import type { SVGAttributes } from 'svelte/elements';
+
+${imports}
+
+${exports}
+
+export type IconStyle = ${toTypeUnion(iconStyles)};
+
+export type IconProps = Omit<SVGAttributes<SVGSVGElement>, 'style' | 'title'> & {
+  size?: number;
+  style?: IconStyle;
+  svgStyle?: string;
+  title?: string | null;
+};
+
+export type IconComponent = Component<IconProps>;
+
+export interface IconEntry {
+  key: string;
+  name: string;
+  value: IconComponent;
+  sizes: number[];
+  styles: IconStyle[];
+  keyword: string;
+  description: string;
+  metaphor: string[];
+}
+
+export const registry: IconEntry[] = [
 ${entries}
 ];
 `;
 }
 
-function writeIconFiles(variants: IconVariant[], iconsDir: string): string[] {
-  if (!fs.existsSync(iconsDir)) {
-    fs.mkdirSync(iconsDir, { recursive: true });
-  }
+function emptyGeneratedIconFiles(iconsDir: string): void {
+	if (!fs.existsSync(iconsDir)) return;
 
-  const files: string[] = [];
-  for (const variant of variants) {
-    const filename = `${toPascalCaseWithUnderscores(variant.name)}_${variant.style}.svelte`;
-    const content = generateIconSvelte(variant);
-    fs.writeFileSync(path.join(iconsDir, filename), content);
-    files.push(filename);
-  }
-  return files;
+	for (const filename of fs.readdirSync(iconsDir)) {
+		if (filename.endsWith(".svelte")) {
+			fs.unlinkSync(path.join(iconsDir, filename));
+		}
+	}
+}
+
+function writeIconFiles(icons: IconDefinition[], iconsDir: string): string[] {
+	if (!fs.existsSync(iconsDir)) {
+		fs.mkdirSync(iconsDir, { recursive: true });
+	}
+
+	const files: string[] = [];
+	for (const icon of icons) {
+		const filename = `${icon.key}.svelte`;
+		const content = generateIconSvelte(icon);
+		fs.writeFileSync(path.join(iconsDir, filename), content);
+		files.push(filename);
+	}
+	return files;
 }
 
 export function generate(): void {
-  console.log('Generating Svelte icon components...');
+	console.log("Generating Svelte icon components...");
+	if (!isProductionBuild) {
+		console.log(
+			`Debug mode: limiting output to ${DEBUG_ICON_LIMIT} icon components`,
+		);
+	}
 
-  const iconDirs = fs.readdirSync(ASSETS_DIR, { withFileTypes: true })
-    .filter((d) => d.isDirectory())
-    .map((d) => d.name);
+	const iconDirs = fs
+		.readdirSync(ASSETS_DIR, { withFileTypes: true })
+		.filter((d) => d.isDirectory())
+		.map((d) => d.name);
 
-  console.log(`Found ${iconDirs.length} icon directories`);
+	console.log(`Found ${iconDirs.length} icon directories`);
 
-  const variants: IconVariant[] = [];
+	const icons: IconDefinition[] = [];
 
-  for (const dirName of iconDirs) {
-    const metaPath = path.join(ASSETS_DIR, dirName, 'metadata.json');
-    if (!fs.existsSync(metaPath)) {
-      console.warn(`  Skipping ${dirName}: no metadata.json`);
-      continue;
-    }
+	for (const dirName of iconDirs) {
+		const metaPath = path.join(ASSETS_DIR, dirName, "metadata.json");
+		if (!fs.existsSync(metaPath)) {
+			console.warn(`  Skipping ${dirName}: no metadata.json`);
+			continue;
+		}
 
-    const meta: IconMeta = JSON.parse(fs.readFileSync(metaPath, 'utf-8'));
-    const svgDir = path.join(ASSETS_DIR, dirName, 'SVG');
-    const bestSize = pickBestSize(meta.size);
+		const meta: IconMeta = JSON.parse(fs.readFileSync(metaPath, "utf-8"));
+		const svgDir = path.join(ASSETS_DIR, dirName, "SVG");
+		const sources: IconSource[] = [];
 
-    for (const style of meta.style) {
-      const snakeName = toSnakeCase(meta.name);
-      const svgFilename = `ic_fluent_${snakeName}_${bestSize}_${style.toLowerCase()}.svg`;
-      const svgPath = path.join(svgDir, svgFilename);
+		for (const size of meta.size) {
+			for (const style of meta.style) {
+				const snakeName = toSnakeCase(meta.name);
+				const svgFilename = `ic_fluent_${snakeName}_${size}_${style.toLowerCase()}.svg`;
+				const svgPath = path.join(svgDir, svgFilename);
 
-      if (!fs.existsSync(svgPath)) {
-        console.warn(`  Skipping ${svgFilename}: file not found`);
-        continue;
-      }
+				if (!fs.existsSync(svgPath)) {
+					console.warn(`  Skipping ${svgFilename}: file not found`);
+					continue;
+				}
 
-      const svgContent = fs.readFileSync(svgPath, 'utf-8');
-      const svgData = extractSvgData(svgContent);
-      if (!svgData) {
-        console.warn(`  Skipping ${svgFilename}: could not extract SVG data`);
-        continue;
-      }
+				const svgContent = fs.readFileSync(svgPath, "utf-8");
+				const svgData = extractSvgData(svgContent);
+				if (!svgData) {
+					console.warn(`  Skipping ${svgFilename}: could not extract SVG data`);
+					continue;
+				}
 
-      variants.push({
-        name: meta.name,
-        style,
-        size: bestSize,
-        viewBox: svgData.viewBox,
-        pathData: svgData.pathData,
-        keyword: meta.keyword ?? 'fluent-icon',
-        description: meta.description ?? '',
-        metaphor: meta.metaphor ?? [],
-        directionType: meta.directionType ?? undefined,
-      });
-    }
-  }
+				sources.push({
+					size,
+					style,
+					viewBox: svgData.viewBox,
+					pathData: svgData.pathData,
+				});
+			}
+		}
 
-  console.log(`Found ${variants.length} icon variants`);
+		if (sources.length === 0) {
+			console.warn(`  Skipping ${dirName}: no SVG sources found`);
+			continue;
+		}
 
-  // Write icon-base.svelte
-  const componentsDir = path.join(OUTPUT_DIR, 'src', 'lib', 'components');
-  if (!fs.existsSync(componentsDir)) {
-    fs.mkdirSync(componentsDir, { recursive: true });
-  }
-  fs.writeFileSync(path.join(componentsDir, 'icon-base.svelte'), generateIconBaseSvelte());
-  console.log('  Written icon-base.svelte');
+		icons.push({
+			key: toPascalCaseWithUnderscores(meta.name),
+			name: meta.name,
+			sizes: meta.size,
+			styles: meta.style,
+			keyword: meta.keyword ?? "fluent-icon",
+			description: meta.description ?? "",
+			metaphor: meta.metaphor ?? [],
+			sources,
+		});
 
-  // Write icon files
-  const iconsDir = path.join(OUTPUT_DIR, 'src', 'lib', 'icons');
-  const writtenFiles = writeIconFiles(variants, iconsDir);
-  console.log(`  Written ${writtenFiles.length} icon component files`);
+		if (!isProductionBuild && icons.length >= DEBUG_ICON_LIMIT) {
+			break;
+		}
+	}
 
-  // Write icons registry for demo
-  const registryContent = generateIconsRegistry(variants);
-  fs.writeFileSync(path.join(OUTPUT_DIR, 'icons.ts'), registryContent);
-  console.log('  Written icons.ts registry');
+	console.log(`Found ${icons.length} icons`);
 
-  console.log('Done.');
+	// Write icon files
+	const iconsDir = path.join(LIB_DIR, "icons");
+	emptyGeneratedIconFiles(iconsDir);
+	const writtenFiles = writeIconFiles(icons, iconsDir);
+	console.log(`  Written ${writtenFiles.length} icon component files`);
+
+	// Write package entrypoint
+	fs.writeFileSync(path.join(LIB_DIR, "index.ts"), generateLibraryIndex(icons));
+	console.log("  Written library index.ts");
+
+	console.log("Done.");
 }

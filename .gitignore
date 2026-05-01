@@ -1,5 +1,7 @@
 .cache
-packages/svelte/src/lib/icons/
-packages/svelte/src/lib/components/icon-base.svelte
-packages/svelte/icons.ts
 .DS_Store
+
+#AI
+.agents
+.codex
+AGENTS.md

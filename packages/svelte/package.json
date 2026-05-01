@@ -1,43 +1,50 @@
 {
-  "name": "@fluentui-icons-like/svelte",
+  "name": "vite-project",
   "version": "0.0.1",
-  "description": "Fluent UI System Icons for Svelte 5",
-  "license": "MIT",
-  "type": "module",
   "scripts": {
-    "predev": "cd ../../builder && pnpm build && pnpm generate",
-    "dev": "vite",
-    "prebuild": "cd ../../builder && pnpm build && pnpm generate",
-    "build": "svelte-package -i src/lib",
-    "build:demo": "vite build",
-    "preview": "vite preview --outDir dist-demo",
-    "generate": "cd ../../builder && pnpm build && pnpm generate"
+    "dev": "vite dev",
+    "build": "vite build && npm run prepack",
+    "preview": "vite preview",
+    "prepare": "svelte-kit sync || echo ''",
+    "prepack": "svelte-kit sync && svelte-package && publint",
+    "svelte-check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check": "biome check --write"
   },
-  "packageManager": "pnpm@10.23.0",
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "!dist/**/*.spec.*"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js"
+    }
+  },
   "peerDependencies": {
     "svelte": "^5.0.0"
   },
   "devDependencies": {
-    "@sveltejs/package": "^2.0.0",
-    "@sveltejs/vite-plugin-svelte": "^5.0.0",
-    "@tsconfig/svelte": "^5.0.0",
-    "svelte": "^5.0.0",
-    "svelte-check": "^4.0.0",
-    "typescript": "^5.7.0",
-    "vite": "^6.0.0"
+    "@biomejs/biome": "^2.4.13",
+    "@sveltejs/adapter-auto": "^7.0.1",
+    "@sveltejs/kit": "^2.58.0",
+    "@sveltejs/package": "^2.5.7",
+    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "@tailwindcss/vite": "^4.2.4",
+    "publint": "^0.3.18",
+    "svelte": "^5.55.5",
+    "svelte-check": "^4.4.7",
+    "tailwindcss": "^4.2.4",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.10"
   },
-  "exports": {
-    "./components/*.svelte": {
-      "types": "./dist/components/*.svelte.d.ts",
-      "svelte": "./dist/components/*.svelte"
-    },
-    "./icons/*.svelte": {
-      "types": "./dist/icons/*.svelte.d.ts",
-      "svelte": "./dist/icons/*.svelte"
-    }
-  },
-  "files": [
-    "dist/components",
-    "dist/icons"
+  "keywords": [
+    "svelte"
   ]
 }
