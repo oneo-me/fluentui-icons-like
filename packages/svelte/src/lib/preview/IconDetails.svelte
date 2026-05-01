@@ -118,6 +118,27 @@
         {/each}
       </div>
     </div>
+
+    {#if selectedIcon.directionType}
+      <div class="mt-3 grid gap-1.5">
+        <span
+          class="text-[11px] font-extrabold tracking-[0.08em] text-[#66706a] uppercase">
+          Direction
+        </span>
+        <div class="flex min-w-0 flex-wrap gap-1">
+          <span
+            class="max-w-full overflow-hidden rounded-full bg-[#e8f0ee] px-2 py-0.5 text-[10px] text-ellipsis whitespace-nowrap text-[#31504b]">
+            {selectedIcon.directionType}
+          </span>
+          {#if selectedIcon.singleton}
+            <span
+              class="max-w-full overflow-hidden rounded-full bg-[#e8f0ee] px-2 py-0.5 text-[10px] text-ellipsis whitespace-nowrap text-[#31504b]">
+              {selectedIcon.singleton}
+            </span>
+          {/if}
+        </div>
+      </div>
+    {/if}
   {:else}
     <div
       class="grid min-h-[220px] place-items-center content-center gap-2 text-center text-[#66706a]">

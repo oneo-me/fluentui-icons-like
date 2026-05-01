@@ -30,13 +30,14 @@ function escapeXml(value: string): string {
 		.replace(/"/g, "&quot;");
 }
 
-function extractSvgData(
+function extractSvgContent(
 	svgContent: string,
-): { viewBox: string; pathData: string } | null {
+): { viewBox: string; innerContent: string } | null {
 	const viewBoxMatch = svgContent.match(/viewBox="([^"]+)"/);
-	const pathMatch = svgContent.match(/<path\s[^>]*\bd="([^"]*)"/);
-	if (!viewBoxMatch || !pathMatch) return null;
-	return { viewBox: viewBoxMatch[1], pathData: pathMatch[1] };
+	if (!viewBoxMatch) return null;
+	const contentMatch = svgContent.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
+	if (!contentMatch) return null;
+	return { viewBox: viewBoxMatch[1], innerContent: contentMatch[1].trim() };
 }
 
 function pickBestSize(availableSizes: number[]): number {
@@ -46,13 +47,6 @@ function pickBestSize(availableSizes: number[]): number {
 	return availableSizes[0];
 }
 
-function formatPathData(d: string, viewBox: string): string {
-	const bounds = viewBox.split(" ").map(Number);
-	const maxX = bounds[2];
-	const maxY = bounds[3];
-	return `${d} M 0 0 M ${maxX} ${maxY}`;
-}
-
 interface IconMeta {
 	name: string;
 	size: number[];
@@ -60,13 +54,15 @@ interface IconMeta {
 	keyword: string | null;
 	description: string | null;
 	metaphor: string[] | null;
+	directionType?: string;
+	singleton?: string;
 }
 
 interface IconSource {
 	size: number;
 	style: string;
 	viewBox: string;
-	pathData: string;
+	innerContent: string;
 }
 
 interface IconDefinition {
@@ -77,6 +73,8 @@ interface IconDefinition {
 	keyword: string;
 	description: string;
 	metaphor: string[];
+	directionType: string | null;
+	singleton: string | null;
 	sources: IconSource[];
 }
 
@@ -94,12 +92,12 @@ function generateIconSvelte(icon: IconDefinition): string {
 	const sizeType = toTypeUnion(icon.sizes);
 	const styleType = toTypeUnion(icon.styles);
 	const sourcesBySize = icon.sources.reduce<
-		Record<number, Record<string, { viewBox: string; pathData: string }>>
+		Record<number, Record<string, { viewBox: string; innerContent: string }>>
 	>((acc, source) => {
 		acc[source.size] ??= {};
 		acc[source.size][source.style] = {
 			viewBox: source.viewBox,
-			pathData: formatPathData(source.pathData, source.viewBox),
+			innerContent: source.innerContent,
 		};
 		return acc;
 	}, {});
@@ -108,7 +106,7 @@ function generateIconSvelte(icon: IconDefinition): string {
 
 	return `<script>
   /**
-   * @typedef {{ viewBox: string; pathData: string }} IconSourceData
+   * @typedef {{ viewBox: string; innerContent: string }} IconSourceData
    */
 
   /**
@@ -127,14 +125,12 @@ function generateIconSvelte(icon: IconDefinition): string {
    * @type {Omit<import('svelte/elements').SVGAttributes<SVGSVGElement>, 'style' | 'title'> & {
    *   size?: IconAssetSize | number;
    *   style?: string;
-   *   svgStyle?: string;
    *   title?: string | null;
    * }}
    */
   let {
     size = defaultSize,
     style = defaultStyle,
-    svgStyle = '',
     title = '${escapedTitle}',
     ...others
   } = $props();
@@ -151,13 +147,13 @@ function generateIconSvelte(icon: IconDefinition): string {
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox={source.viewBox}
-    style={\`width: \${size}px; height: \${size}px; \${svgStyle}\`}
+    style={\`width: \${size}px; height: \${size}px\`}
     {...others}
   >
     {#if title}
       <title>{title}</title>
     {/if}
-    <path d={source.pathData} />
+    {@html source.innerContent}
   </svg>
 {/if}
 
@@ -204,6 +200,8 @@ function generateLibraryIndex(icons: IconDefinition[]): string {
 				keyword: icon.keyword,
 				description: icon.description,
 				metaphor: icon.metaphor,
+				directionType: icon.directionType,
+				singleton: icon.singleton,
 			};
 			return `  { ...${JSON.stringify(metadata)}, value: ${filename} },`;
 		})
@@ -222,7 +220,6 @@ export type IconStyle = ${toTypeUnion(iconStyles)};
 export type IconProps = Omit<SVGAttributes<SVGSVGElement>, 'style' | 'title'> & {
   size?: number;
   style?: IconStyle;
-  svgStyle?: string;
   title?: string | null;
 };
 
@@ -237,6 +234,8 @@ export interface IconEntry {
   keyword: string;
   description: string;
   metaphor: string[];
+  directionType: string | null;
+  singleton: string | null;
 }
 
 export const registry: IconEntry[] = [
@@ -296,8 +295,23 @@ export function generate(): void {
 		for (const size of meta.size) {
 			for (const style of meta.style) {
 				const snakeName = toSnakeCase(meta.name);
-				const svgFilename = `ic_fluent_${snakeName}_${size}_${style.toLowerCase()}.svg`;
-				const svgPath = path.join(svgDir, svgFilename);
+				let svgFilename = `ic_fluent_${snakeName}_${size}_${style.toLowerCase()}.svg`;
+				let svgPath = path.join(svgDir, svgFilename);
+
+				if (!fs.existsSync(svgPath)) {
+					const suffix =
+						meta.directionType === "unique"
+							? meta.singleton?.toLowerCase()
+							: undefined;
+					if (suffix) {
+						const altFilename = `ic_fluent_${snakeName}_${size}_${style.toLowerCase()}_${suffix}.svg`;
+						const altPath = path.join(svgDir, altFilename);
+						if (fs.existsSync(altPath)) {
+							svgFilename = altFilename;
+							svgPath = altPath;
+						}
+					}
+				}
 
 				if (!fs.existsSync(svgPath)) {
 					console.warn(`  Skipping ${svgFilename}: file not found`);
@@ -305,7 +319,7 @@ export function generate(): void {
 				}
 
 				const svgContent = fs.readFileSync(svgPath, "utf-8");
-				const svgData = extractSvgData(svgContent);
+				const svgData = extractSvgContent(svgContent);
 				if (!svgData) {
 					console.warn(`  Skipping ${svgFilename}: could not extract SVG data`);
 					continue;
@@ -315,7 +329,7 @@ export function generate(): void {
 					size,
 					style,
 					viewBox: svgData.viewBox,
-					pathData: svgData.pathData,
+					innerContent: svgData.innerContent,
 				});
 			}
 		}
@@ -325,14 +339,19 @@ export function generate(): void {
 			continue;
 		}
 
+		const actualSizes = [...new Set(sources.map((s) => s.size))];
+		const actualStyles = [...new Set(sources.map((s) => s.style))];
+
 		icons.push({
 			key: toPascalCaseWithUnderscores(meta.name),
 			name: meta.name,
-			sizes: meta.size,
-			styles: meta.style,
+			sizes: actualSizes,
+			styles: actualStyles,
 			keyword: meta.keyword ?? "fluent-icon",
 			description: meta.description ?? "",
 			metaphor: meta.metaphor ?? [],
+			directionType: meta.directionType ?? null,
+			singleton: meta.singleton ?? null,
 			sources,
 		});
 	}
