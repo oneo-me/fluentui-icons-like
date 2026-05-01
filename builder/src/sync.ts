@@ -20,6 +20,8 @@ export function syncSource(): void {
     execSync('git pull --ff-only', { cwd: sourceDir, stdio: 'inherit' });
   } else {
     console.log(`Cloning ${REPO_URL} to ${sourceDir}...`);
-    execSync(`git clone --depth 1 ${REPO_URL} "${sourceDir}"`, { stdio: 'inherit' });
+    execSync(`git clone --depth 1 ${REPO_URL} "${sourceDir}"`, {
+      stdio: 'inherit',
+    });
   }
 }

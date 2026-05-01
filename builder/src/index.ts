@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
-import { syncSource } from './sync.js';
 import { generate } from './generate.js';
+import { syncSource } from './sync.js';
 
 function main() {
   const command = process.argv[2];
