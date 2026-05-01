@@ -95,6 +95,7 @@ export const svelteGenerator: Generator = {
 
 <style>
   svg {
+    color: inherit;
     stroke: currentColor;
     fill: currentColor;
     stroke-width: 0;

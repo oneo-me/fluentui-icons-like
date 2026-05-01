@@ -29,7 +29,17 @@ export function extractSvgContent(
   if (!viewBoxMatch) return null;
   const contentMatch = svgContent.match(/<svg[^>]*>([\s\S]*)<\/svg>/);
   if (!contentMatch) return null;
-  return { viewBox: viewBoxMatch[1], innerContent: contentMatch[1].trim() };
+  return {
+    viewBox: viewBoxMatch[1],
+    innerContent: normalizeSvgColor(contentMatch[1].trim()),
+  };
+}
+
+function normalizeSvgColor(content: string): string {
+  return content.replace(
+    /\s(fill|stroke)="(?!none\b|currentColor\b)[^"]+"/g,
+    ' $1="currentColor"',
+  );
 }
 
 export function pickBestSize(availableSizes: number[]): number {

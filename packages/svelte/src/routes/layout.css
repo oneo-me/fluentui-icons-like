@@ -7,7 +7,14 @@
 
   body {
     margin: 0;
-    background: #eef0ea;
+    background: var(--color-stone-100);
+    color-scheme: light dark;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    body {
+      background: var(--color-zinc-950);
+    }
   }
 
   button,

@@ -48,7 +48,6 @@
   let selectedMetaphor = $state('');
   let metaphorKeyword = $state('');
   let selectedIcon = $state<IconEntry | null>(null);
-  let copiedKey = $state('');
 
   let gridEl = $state<HTMLDivElement | null>(null);
   let containerWidth = $state(900);
@@ -167,18 +166,6 @@
     resetScroll();
   }
 
-  async function copyKey(key: string) {
-    await navigator.clipboard.writeText(key);
-    copiedKey = key;
-    window.setTimeout(() => {
-      if (copiedKey === key) copiedKey = '';
-    }, 1200);
-  }
-
-  function copySelectedKey() {
-    if (selectedIcon) void copyKey(selectedIcon.key);
-  }
-
   function selectIcon(icon: IconEntry) {
     selectedIcon = icon;
   }
@@ -264,7 +251,7 @@
   <meta name="twitter:description" content="Browse, search, and copy over 2,000+ SVG icon components for Svelte — based on Microsoft Fluent UI System Icons." />
 </svelte:head>
 
-<div class="h-screen overflow-hidden bg-[#eef0ea] font-sans text-[#18211e]">
+<div class="h-screen overflow-hidden bg-stone-100 font-sans text-slate-950 dark:bg-zinc-950 dark:text-zinc-100">
   <div
     class="grid h-full min-h-0 grid-cols-[236px_minmax(0,1fr)_236px] max-[1120px]:grid-cols-[236px_minmax(0,1fr)] max-[760px]:grid-cols-1">
     <FilterSidebar
@@ -300,8 +287,6 @@
 
     <IconDetails
       {selectedIcon}
-      {selectedStyle}
-      {copiedKey}
-      onCopySelectedKey={copySelectedKey} />
+      {selectedStyle} />
   </div>
 </div>
