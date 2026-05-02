@@ -307,6 +307,6 @@
       {onScroll}
       onSelectIcon={selectIcon} />
 
-    <IconDetails {selectedIcon} {selectedStyle} />
+    <IconDetails {selectedIcon} {selectedSize} {selectedStyle} />
   </div>
 </div>

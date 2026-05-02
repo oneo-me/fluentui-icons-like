@@ -1,12 +1,17 @@
 <script lang="ts">
+  import ArrowDownloadIcon from '$lib/icons/Arrow_Download.svelte';
+  import CodeIcon from '$lib/icons/Code.svelte';
   import CopyIcon from '$lib/icons/Copy.svelte';
+  import ImageIcon from '$lib/icons/Image.svelte';
   import type { IconEntry, IconStyle } from '$lib/index.js';
 
   let {
     selectedIcon,
+    selectedSize,
     selectedStyle,
   }: {
     selectedIcon: IconEntry | null;
+    selectedSize: number;
     selectedStyle: IconStyle;
   } = $props();
 
@@ -20,6 +25,8 @@
     'max-w-full overflow-hidden rounded-full bg-teal-50 px-2 py-0.5 text-[10px] text-ellipsis whitespace-nowrap text-teal-900 dark:bg-teal-950/60 dark:text-teal-100';
   const copyButtonClass =
     'copy-button inline-flex size-7 flex-none cursor-pointer items-center justify-center rounded-md bg-transparent p-0 text-[11px] font-extrabold text-slate-950 transition-colors hover:bg-teal-50 hover:text-teal-900 dark:text-zinc-100 dark:hover:bg-teal-950/60 dark:hover:text-teal-200';
+  const actionButtonClass =
+    'copy-button inline-flex h-8 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-slate-900/10 bg-white px-2 text-[11px] font-extrabold text-slate-950 transition-colors hover:border-teal-300 hover:bg-teal-50 hover:text-teal-900 dark:border-zinc-100/10 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:border-teal-700 dark:hover:bg-teal-950/60 dark:hover:text-teal-200';
 
   let copiedKey = $state('');
   let copiedKeyPulse = $state(0);
@@ -27,6 +34,10 @@
   let copiedName = $state('');
   let copiedNamePulse = $state(0);
   let copiedNameTimeout: ReturnType<typeof window.setTimeout> | undefined;
+  let copiedSvg = $state(false);
+  let copiedSvgPulse = $state(0);
+  let copiedSvgTimeout: ReturnType<typeof window.setTimeout> | undefined;
+  let sourcePreviewEl = $state<HTMLDivElement | null>(null);
 
   function splitKeywords(keyword: string) {
     return keyword
@@ -54,6 +65,93 @@
     }, 420);
     void navigator.clipboard.writeText(name).catch(() => undefined);
   }
+
+  function getFilename(extension: 'svg' | 'png') {
+    const name = selectedIcon?.key ?? 'icon';
+    return `${name}_${selectedSize}_${selectedStyle.toLowerCase()}.${extension}`;
+  }
+
+  function getSvgCode() {
+    const svg = sourcePreviewEl?.querySelector('svg');
+    if (!svg) return '';
+
+    const clone = svg.cloneNode(true) as SVGSVGElement;
+    clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    clone.setAttribute('width', String(selectedSize));
+    clone.setAttribute('height', String(selectedSize));
+    clone.style.width = '';
+    clone.style.height = '';
+
+    return new XMLSerializer().serializeToString(clone);
+  }
+
+  function downloadBlob(blob: Blob, filename: string) {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function downloadSvg() {
+    const svgCode = getSvgCode();
+    if (!svgCode) return;
+
+    downloadBlob(
+      new Blob([svgCode], { type: 'image/svg+xml;charset=utf-8' }),
+      getFilename('svg'),
+    );
+  }
+
+  async function downloadPng() {
+    const svgCode = getSvgCode();
+    if (!svgCode) return;
+
+    const exportSize = Math.max(256, selectedSize * 8);
+    const blob = new Blob([svgCode], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const image = new Image();
+
+    try {
+      await new Promise<void>((resolve, reject) => {
+        image.onload = () => resolve();
+        image.onerror = () => reject(new Error('Unable to render icon image'));
+        image.src = url;
+      });
+
+      const canvas = document.createElement('canvas');
+      canvas.width = exportSize;
+      canvas.height = exportSize;
+
+      const context = canvas.getContext('2d');
+      if (!context) return;
+
+      context.clearRect(0, 0, exportSize, exportSize);
+      context.drawImage(image, 0, 0, exportSize, exportSize);
+
+      canvas.toBlob((pngBlob) => {
+        if (pngBlob) downloadBlob(pngBlob, getFilename('png'));
+      }, 'image/png');
+    } catch {
+      return;
+    } finally {
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  function copySvgCode() {
+    const svgCode = getSvgCode();
+    if (!svgCode) return;
+
+    copiedSvg = true;
+    copiedSvgPulse += 1;
+    window.clearTimeout(copiedSvgTimeout);
+    copiedSvgTimeout = window.setTimeout(() => {
+      copiedSvg = false;
+    }, 420);
+    void navigator.clipboard.writeText(svgCode).catch(() => undefined);
+  }
 </script>
 
 <aside
@@ -72,7 +170,51 @@
               style={selectedStyle}
               title={selectedIcon.name} />
           </div>
+          <div
+            class="pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0"
+            aria-hidden="true"
+            bind:this={sourcePreviewEl}>
+            <DetailComp
+              size={selectedSize}
+              style={selectedStyle}
+              title={selectedIcon.name} />
+          </div>
         </dd>
+      </div>
+      <div class="grid grid-cols-3 gap-1.5 px-2 pb-2">
+        <button
+          type="button"
+          class={actionButtonClass}
+          aria-label="Download SVG"
+          title="Download SVG"
+          onclick={downloadSvg}>
+          <ArrowDownloadIcon size={16} style={selectedStyle} title={null} />
+          <span>SVG</span>
+        </button>
+        <button
+          type="button"
+          class={actionButtonClass}
+          aria-label="Download PNG"
+          title="Download PNG"
+          onclick={downloadPng}>
+          <ImageIcon size={16} style={selectedStyle} title={null} />
+          <span>PNG</span>
+        </button>
+        <button
+          type="button"
+          class={actionButtonClass}
+          data-copied={copiedSvg}
+          data-copy-pulse={copiedSvgPulse % 2 === 0 ? "even" : "odd"}
+          aria-label="Copy SVG code"
+          title={copiedSvg ? "Copied" : "Copy SVG code"}
+          onclick={copySvgCode}>
+          {#if copiedSvg}
+            <CopyIcon size={16} style={selectedStyle} title={null} />
+          {:else}
+            <CodeIcon size={16} style={selectedStyle} title={null} />
+          {/if}
+          <span>Code</span>
+        </button>
       </div>
       <div class={detailRow}>
         <dt class={detailLabel}>Key</dt>
