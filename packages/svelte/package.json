@@ -1,31 +1,43 @@
 {
   "name": "@oneo/fluentui-icons-like",
-  "version": "0.0.1",
+  "version": "2.0.0-beta.0",
+  "description": "Microsoft Fluent UI System Icons as Svelte 5 runes-mode components. Tree-shakable, type-safe SVG icons with zero dependencies — import only what you need.",
+  "author": "ONEO",
+  "license": "MIT",
+  "homepage": "https://github.com/oneo-me/fluentui-icons-like#readme",
+  "bugs": "https://github.com/oneo-me/fluentui-icons-like/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oneo-me/fluentui-icons-like.git",
+    "directory": "packages/svelte"
+  },
+  "keywords": [
+    "svelte",
+    "svelte5",
+    "sveltekit",
+    "fluentui",
+    "fluent-ui",
+    "fluent",
+    "icons",
+    "icon",
+    "svg",
+    "svg-icons",
+    "microsoft",
+    "system-icons",
+    "tree-shakable",
+    "runes-mode"
+  ],
+  "type": "module",
   "scripts": {
     "dev": "vite dev",
     "build": "vite build && npm run prepack",
     "preview": "vite preview",
     "prepare": "svelte-kit sync || echo ''",
-    "prepack": "svelte-kit sync && svelte-package && publint",
+    "prepack": "svelte-kit sync && svelte-package -i src/lib/icons && publint",
     "svelte-check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-    "check": "biome check --write"
-  },
-  "files": [
-    "dist",
-    "!dist/**/*.test.*",
-    "!dist/**/*.spec.*"
-  ],
-  "sideEffects": [
-    "**/*.css"
-  ],
-  "svelte": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "type": "module",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "svelte": "./dist/index.js"
-    }
+    "check": "biome check --write",
+    "pack": "pnpm pack",
+    "publish": "pnpm publish"
   },
   "peerDependencies": {
     "svelte": "^5.0.0"
@@ -44,7 +56,18 @@
     "typescript": "^6.0.3",
     "vite": "^8.0.10"
   },
-  "keywords": [
-    "svelte"
-  ]
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    "./*.svelte": {
+      "types": "./*.svelte.d.ts",
+      "svelte": "./*.svelte"
+    }
+  },
+  "files": [
+    "../../README.md",
+    "dist/**"
+  ],
+  "sideEffects": false
 }
