@@ -11,8 +11,11 @@
   const PADDING = 10;
   const MIN_OVERSCAN_ROWS = 8;
   const MAX_OVERSCAN_ROWS = 24;
+  const DEFAULT_ICON_COLOR = '#333333';
 
   const VALID_STYLES = new Set<IconStyle>(['Filled', 'Light', 'Regular']);
+  const VALID_SCALES = new Set([1, 2, 3]);
+  const HEX_COLOR_RE = /^#[0-9a-f]{6}$/i;
 
   function readParams(url: URL): {
     keyword: string;
@@ -20,9 +23,13 @@
     style: IconStyle;
     metaphor: string;
     iconKey: string;
+    color: string;
+    scale: number;
   } {
     const p = url.searchParams;
     const style = p.get('style') ?? '';
+    const color = p.get('color') ?? '';
+    const scale = Number(p.get('scale')) || 1;
     return {
       keyword: p.get('q') ?? '',
       size: Number(p.get('size')) || 20,
@@ -31,6 +38,10 @@
         : 'Regular',
       metaphor: p.get('metaphor') ?? '',
       iconKey: p.get('icon') ?? '',
+      color: HEX_COLOR_RE.test(color)
+        ? color.toLowerCase()
+        : DEFAULT_ICON_COLOR,
+      scale: VALID_SCALES.has(scale) ? scale : 1,
     };
   }
 
@@ -41,6 +52,8 @@
     if (selectedStyle !== 'Regular') p.set('style', selectedStyle);
     if (selectedMetaphor) p.set('metaphor', selectedMetaphor);
     if (selectedIcon) p.set('icon', selectedIcon.key);
+    if (selectedColor !== DEFAULT_ICON_COLOR) p.set('color', selectedColor);
+    if (selectedScale !== 1) p.set('scale', String(selectedScale));
     return p;
   }
 
@@ -49,6 +62,8 @@
   let selectedSize = $state(20);
   let selectedStyle = $state<IconStyle>('Regular');
   let selectedMetaphor = $state('');
+  let selectedColor = $state(DEFAULT_ICON_COLOR);
+  let selectedScale = $state(1);
   let metaphorKeyword = $state('');
   let selectedIcon = $state<IconEntry | null>(null);
 
@@ -88,7 +103,8 @@
   let leftFiltered = $derived(source.filter(matchesLeftFilters));
   let filtered = $derived(leftFiltered.filter(matchesSearch));
   let gridWidth = $derived(Math.max(0, containerWidth));
-  let baseItemSize = $derived(Math.max(36, selectedSize + 24));
+  let displaySize = $derived(selectedSize * selectedScale);
+  let baseItemSize = $derived(Math.max(36, displaySize + 24));
 
   let columnsPerRow = $derived(
     Math.max(1, Math.floor((gridWidth + GAP) / (baseItemSize + GAP))),
@@ -172,6 +188,13 @@
     resetScroll();
   }
 
+  function selectScale(scale: number) {
+    if (!VALID_SCALES.has(scale)) return;
+
+    selectedScale = scale;
+    resetScroll();
+  }
+
   function selectIcon(icon: IconEntry) {
     selectedIcon = icon;
   }
@@ -191,6 +214,8 @@
     selectedSize = params.size;
     selectedStyle = params.style;
     selectedMetaphor = params.metaphor;
+    selectedColor = params.color;
+    selectedScale = params.scale;
 
     if (params.iconKey) {
       selectedIcon =
@@ -274,8 +299,7 @@
 
 <div
   class="h-screen overflow-hidden bg-white font-sans text-slate-800 dark:bg-zinc-950 dark:text-zinc-100">
-  <div
-    class="grid h-full min-h-0 grid-cols-[236px_minmax(0,1fr)_236px] max-[1120px]:grid-cols-[236px_minmax(0,1fr)] max-[760px]:grid-cols-1">
+  <div class="grid h-full min-h-0 grid-cols-[236px_minmax(0,1fr)_236px]">
     <FilterSidebar
       iconCount={source.length}
       {allSizes}
@@ -298,6 +322,7 @@
       {selectedIcon}
       {selectedSize}
       {selectedStyle}
+      {selectedScale}
       {totalRows}
       {rowHeight}
       padding={PADDING}
@@ -305,8 +330,14 @@
       {itemsTop}
       {itemSize}
       {onScroll}
+      bind:selectedColor
+      onSelectScale={selectScale}
       onSelectIcon={selectIcon} />
 
-    <IconDetails {selectedIcon} {selectedSize} {selectedStyle} />
+    <IconDetails
+      {selectedIcon}
+      {selectedSize}
+      {selectedStyle}
+      {selectedColor} />
   </div>
 </div>

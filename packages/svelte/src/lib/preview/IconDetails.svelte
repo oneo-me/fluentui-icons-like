@@ -9,10 +9,12 @@
     selectedIcon,
     selectedSize,
     selectedStyle,
+    selectedColor,
   }: {
     selectedIcon: IconEntry | null;
     selectedSize: number;
     selectedStyle: IconStyle;
+    selectedColor: string;
   } = $props();
 
   const detailRow =
@@ -79,8 +81,8 @@
     clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     clone.setAttribute('width', String(selectedSize));
     clone.setAttribute('height', String(selectedSize));
-    clone.style.width = '';
-    clone.style.height = '';
+    clone.setAttribute('color', selectedColor);
+    clone.style.cssText = `color: ${selectedColor}`;
 
     return new XMLSerializer().serializeToString(clone);
   }
@@ -155,7 +157,7 @@
 </script>
 
 <aside
-  class="overflow-y-auto border-l border-teal-900/15 bg-white px-2 py-3 max-[1120px]:hidden dark:border-teal-300/15 dark:bg-zinc-900/75"
+  class="overflow-y-auto border-l border-teal-900/15 bg-white px-2 py-3 dark:border-teal-300/15 dark:bg-zinc-900/75"
   aria-label="Selected icon details">
   {#if selectedIcon}
     {@const DetailComp = selectedIcon.value}
@@ -164,7 +166,8 @@
         <dt class="sr-only">Preview</dt>
         <dd class="m-0 min-w-0" aria-label="Preview">
           <div
-            class="preview-grid grid aspect-square w-full place-items-center rounded-lg border border-teal-900/15 bg-white text-teal-800 dark:border-teal-300/15 dark:bg-zinc-950 dark:text-teal-200">
+            class="preview-grid grid aspect-square w-full place-items-center rounded-lg border border-teal-900/15 bg-white dark:border-teal-300/15 dark:bg-zinc-950"
+            style="color: {selectedColor}">
             <DetailComp
               size={120}
               style={selectedStyle}
@@ -173,7 +176,8 @@
           <div
             class="pointer-events-none absolute h-0 w-0 overflow-hidden opacity-0"
             aria-hidden="true"
-            bind:this={sourcePreviewEl}>
+            bind:this={sourcePreviewEl}
+            style="color: {selectedColor}">
             <DetailComp
               size={selectedSize}
               style={selectedStyle}

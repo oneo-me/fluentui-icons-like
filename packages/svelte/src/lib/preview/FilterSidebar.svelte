@@ -40,10 +40,10 @@
 </script>
 
 <aside
-  class="flex min-h-0 flex-col overflow-hidden border-r border-teal-900/15 bg-white p-2.5 max-[760px]:grid max-[760px]:grid-cols-2 max-[760px]:gap-2.5 max-[760px]:overflow-y-auto max-[760px]:border-r-0 max-[760px]:border-b dark:border-teal-300/15 dark:bg-zinc-900/75"
+  class="flex min-h-0 flex-col overflow-hidden border-r border-teal-900/15 bg-white p-2.5 dark:border-teal-300/15 dark:bg-zinc-900/75"
   aria-label="Icon filters">
   <div
-    class="mb-3 grid min-w-[172px] gap-2 border-b border-teal-900/15 pb-2.5 max-[760px]:col-span-full max-[760px]:mb-0 max-[760px]:min-w-0 dark:border-teal-300/15">
+    class="mb-3 grid min-w-[172px] gap-2 border-b border-teal-900/15 pb-2.5 dark:border-teal-300/15">
     <div class="flex min-h-10 items-center gap-2">
       <span
         class="grid size-[30px] place-items-center border border-teal-600 bg-teal-600 font-serif text-lg font-bold text-white dark:border-teal-300 dark:bg-teal-300 dark:text-teal-950">
@@ -70,7 +70,7 @@
     </a>
   </div>
 
-  <section class="min-h-0 pb-3 max-[760px]:p-0">
+  <section class="min-h-0 pb-3">
     <div class="mb-2 flex items-center justify-between gap-2.5">
       <span
         class="text-[11px] font-extrabold tracking-[0.08em] text-slate-500 uppercase dark:text-zinc-400">
@@ -90,7 +90,7 @@
   </section>
 
   <section
-    class="min-h-0 border-t border-teal-900/15 pt-3 pb-3 max-[760px]:border-t-0 max-[760px]:p-0 dark:border-teal-300/15">
+    class="min-h-0 border-t border-teal-900/15 pt-3 pb-3 dark:border-teal-300/15">
     <div class="mb-2 flex items-center justify-between gap-2.5">
       <span
         class="text-[11px] font-extrabold tracking-[0.08em] text-slate-500 uppercase dark:text-zinc-400">
@@ -110,7 +110,7 @@
   </section>
 
   <section
-    class="flex min-h-0 flex-1 flex-col border-t border-teal-900/15 pt-3 max-[760px]:border-t-0 max-[760px]:p-0 dark:border-teal-300/15">
+    class="flex min-h-0 flex-1 flex-col border-t border-teal-900/15 pt-3 dark:border-teal-300/15">
     <div class="mb-2 flex items-center justify-between gap-2.5">
       <span
         class="text-[11px] font-extrabold tracking-[0.08em] text-slate-500 uppercase dark:text-zinc-400">
@@ -125,7 +125,7 @@
         placeholder="Filter metaphors" />
     </label>
     <div
-      class="-mr-2.5 flex min-h-0 flex-1 flex-wrap content-start items-start gap-1 overflow-y-auto pr-2.5 [scrollbar-gutter:stable] max-[760px]:mr-0">
+      class="-mr-2.5 flex min-h-0 flex-1 flex-wrap content-start items-start gap-1 overflow-y-auto pr-2.5 [scrollbar-gutter:stable]">
       <button
         type="button"
         class={`${chipClass(selectedMetaphor === '')} w-auto max-w-full`}
@@ -145,7 +145,7 @@
   </section>
 
   <div
-    class="mt-3 grid gap-1 border-t border-teal-900/15 pt-2.5 text-[11px] leading-[1.35] text-slate-500 max-[760px]:col-span-full max-[760px]:mt-0 dark:border-teal-300/15 dark:text-zinc-400">
+    class="mt-3 grid gap-1 border-t border-teal-900/15 pt-2.5 text-[11px] leading-[1.35] text-slate-500 dark:border-teal-300/15 dark:text-zinc-400">
     <span>
       This project was created by
       <a
