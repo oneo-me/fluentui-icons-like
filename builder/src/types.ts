@@ -13,7 +13,21 @@ export interface IconSource {
   size: number;
   style: string;
   viewBox: string;
-  innerContent: string;
+  nodes: SvgNode[];
+}
+
+export type SvgNode = SvgElementNode | SvgTextNode;
+
+export interface SvgElementNode {
+  type: 'element';
+  name: string;
+  attributes: Record<string, string>;
+  children: SvgNode[];
+}
+
+export interface SvgTextNode {
+  type: 'text';
+  value: string;
 }
 
 export interface IconDefinition {

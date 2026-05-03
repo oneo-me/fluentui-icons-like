@@ -1,6 +1,6 @@
 import { resolve } from 'node:path';
 import { ROOT_DIR } from '../constants.js';
-import type { IconDefinition } from '../types.js';
+import type { IconDefinition, SvgNode } from '../types.js';
 import {
   escapeXml,
   naturalCompare,
@@ -28,22 +28,31 @@ export const svelteGenerator: Generator = {
     const sizeType = toTypeUnion(icon.sizes);
     const styleType = toTypeUnion(icon.styles);
     const sourcesBySize = icon.sources.reduce<
-      Record<number, Record<string, { viewBox: string; innerContent: string }>>
+      Record<number, Record<string, { key: string; viewBox: string }>>
     >((acc, source) => {
       acc[source.size] ??= {};
       acc[source.size][source.style] = {
+        key: getSourceKey(source.size, source.style),
         viewBox: source.viewBox,
-        innerContent: source.innerContent,
       };
       return acc;
     }, {});
     const sourceData = JSON.stringify(sourcesBySize, null, 2);
     const escapedTitle = escapeXml(icon.name);
+    const sourceBranches = icon.sources
+      .map((source, index) => {
+        const marker = index === 0 ? '{#if' : '{:else if';
+        const markup = renderSvgNodes(source.nodes, 4);
+        return `${marker} source.key === '${getSourceKey(source.size, source.style)}'}
+${markup}
+    ${index === icon.sources.length - 1 ? '{/if}' : ''}`;
+      })
+      .join('');
 
     return `<script lang="ts">
   import type { SVGAttributes } from 'svelte/elements';
 
-  type IconSourceData = { viewBox: string; innerContent: string };
+  type IconSourceData = { key: string; viewBox: string };
 
   const paths: Record<number, Record<string, IconSourceData>> = ${sourceData};
   const defaultSize = ${defaultSize};
@@ -83,7 +92,7 @@ export const svelteGenerator: Generator = {
     {#if title}
       <title>{title}</title>
     {/if}
-    {@html source.innerContent}
+    ${sourceBranches}
   </svg>
 {/if}
 
@@ -177,3 +186,33 @@ ${entries}
 `;
   },
 };
+
+function getSourceKey(size: number, style: string): string {
+  return `${size}-${style}`;
+}
+
+function renderSvgNodes(nodes: SvgNode[], depth: number): string {
+  return nodes.map((node) => renderSvgNode(node, depth)).join('\n');
+}
+
+function renderSvgNode(node: SvgNode, depth: number): string {
+  const indent = '  '.repeat(depth);
+  if (node.type === 'text') {
+    return `${indent}${escapeXml(node.value)}`;
+  }
+
+  const attributes = Object.entries(node.attributes)
+    .map(([name, value]) =>
+      value ? `${name}="${escapeXml(value)}"` : `${name}`,
+    )
+    .join(' ');
+  const openingTag = attributes ? `${node.name} ${attributes}` : node.name;
+
+  if (node.children.length === 0) {
+    return `${indent}<${openingTag} />`;
+  }
+
+  return `${indent}<${openingTag}>
+${renderSvgNodes(node.children, depth + 1)}
+${indent}</${node.name}>`;
+}

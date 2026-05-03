@@ -66,7 +66,7 @@ export function scanIcons(): IconDefinition[] {
           size,
           style,
           viewBox: svgData.viewBox,
-          innerContent: svgData.innerContent,
+          nodes: svgData.nodes,
         });
       }
     }
