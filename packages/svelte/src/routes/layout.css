@@ -7,7 +7,7 @@
 
   body {
     margin: 0;
-    background: var(--color-stone-100);
+    background: white;
     color-scheme: light dark;
   }
 

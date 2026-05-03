@@ -16,17 +16,17 @@
   } = $props();
 
   const detailRow =
-    'grid gap-1.5 border-b border-slate-900/10 py-2 dark:border-zinc-100/10';
+    'grid gap-1.5 border-b border-teal-900/15 py-2 dark:border-teal-300/15';
   const detailLabel =
     'text-[11px] font-extrabold tracking-[0.08em] text-slate-500 uppercase dark:text-zinc-400';
   const detailValue =
-    'm-0 min-w-0 text-xs leading-[1.45] break-words text-slate-950 dark:text-zinc-100';
+    'm-0 min-w-0 text-xs leading-[1.45] break-words text-slate-700 dark:text-zinc-100';
   const tagClass =
-    'max-w-full overflow-hidden rounded-full bg-teal-50 px-2 py-0.5 text-[10px] text-ellipsis whitespace-nowrap text-teal-900 dark:bg-teal-950/60 dark:text-teal-100';
+    'max-w-full overflow-hidden rounded-full border border-teal-900/15 bg-white px-2 py-0.5 text-[10px] text-ellipsis whitespace-nowrap text-teal-900 dark:border-teal-300/15 dark:bg-zinc-950 dark:text-teal-100';
   const copyButtonClass =
-    'copy-button inline-flex size-7 flex-none cursor-pointer items-center justify-center rounded-md bg-transparent p-0 text-[11px] font-extrabold text-slate-950 transition-colors hover:bg-teal-50 hover:text-teal-900 dark:text-zinc-100 dark:hover:bg-teal-950/60 dark:hover:text-teal-200';
+    'copy-button inline-flex size-7 flex-none cursor-pointer items-center justify-center rounded-md bg-transparent p-0 text-[11px] font-extrabold text-slate-800 transition-colors hover:bg-teal-50 hover:text-teal-800 dark:text-zinc-100 dark:hover:bg-teal-950/60 dark:hover:text-teal-200';
   const actionButtonClass =
-    'copy-button inline-flex h-8 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-slate-900/10 bg-white px-2 text-[11px] font-extrabold text-slate-950 transition-colors hover:border-teal-300 hover:bg-teal-50 hover:text-teal-900 dark:border-zinc-100/10 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:border-teal-700 dark:hover:bg-teal-950/60 dark:hover:text-teal-200';
+    'copy-button inline-flex h-8 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-teal-900/15 bg-white px-2 text-[11px] font-extrabold text-slate-800 transition-colors hover:border-teal-600 hover:bg-teal-50 hover:text-teal-800 dark:border-teal-300/15 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:border-teal-400 dark:hover:bg-teal-950/60 dark:hover:text-teal-200';
 
   let copiedKey = $state('');
   let copiedKeyPulse = $state(0);
@@ -155,7 +155,7 @@
 </script>
 
 <aside
-  class="overflow-y-auto border-l border-slate-900/10 bg-stone-50/75 px-2 py-3 max-[1120px]:hidden dark:border-zinc-100/10 dark:bg-zinc-900/75"
+  class="overflow-y-auto border-l border-teal-900/15 bg-white px-2 py-3 max-[1120px]:hidden dark:border-teal-300/15 dark:bg-zinc-900/75"
   aria-label="Selected icon details">
   {#if selectedIcon}
     {@const DetailComp = selectedIcon.value}
@@ -164,7 +164,7 @@
         <dt class="sr-only">Preview</dt>
         <dd class="m-0 min-w-0" aria-label="Preview">
           <div
-            class="preview-grid grid aspect-square w-full place-items-center rounded-lg border border-stone-300 bg-white text-teal-900 dark:border-zinc-700 dark:bg-zinc-950 dark:text-teal-200">
+            class="preview-grid grid aspect-square w-full place-items-center rounded-lg border border-teal-900/15 bg-white text-teal-800 dark:border-teal-300/15 dark:bg-zinc-950 dark:text-teal-200">
             <DetailComp
               size={120}
               style={selectedStyle}
@@ -219,7 +219,7 @@
       <div class={detailRow}>
         <dt class={detailLabel}>Key</dt>
         <dd
-          class="m-0 flex min-w-0 items-center justify-between gap-2 text-xs leading-7 text-slate-950 dark:text-zinc-100">
+          class="m-0 flex min-w-0 items-center justify-between gap-2 text-xs leading-7 text-slate-700 dark:text-zinc-100">
           <span class="min-w-0 [overflow-wrap:anywhere]"
             >{selectedIcon.key}</span
           >
@@ -238,7 +238,7 @@
       <div class={detailRow}>
         <dt class={detailLabel}>Name</dt>
         <dd
-          class="m-0 flex min-w-0 items-center justify-between gap-2 text-xs leading-7 text-slate-950 dark:text-zinc-100">
+          class="m-0 flex min-w-0 items-center justify-between gap-2 text-xs leading-7 text-slate-700 dark:text-zinc-100">
           <span class="min-w-0 [overflow-wrap:anywhere]"
             >{selectedIcon.name}</span
           >
@@ -296,7 +296,7 @@
   {:else}
     <div
       class="grid min-h-[220px] place-items-center content-center gap-2 text-center text-slate-500 dark:text-zinc-400">
-      <strong class="font-serif text-xl text-slate-950 dark:text-zinc-100"
+      <strong class="font-serif text-xl text-slate-800 dark:text-zinc-100"
         >Select an icon</strong
       >
       <span>Details appear here.</span>
@@ -309,11 +309,11 @@
     background-image:
       linear-gradient(
         90deg,
-        color-mix(in oklab, var(--color-teal-700) 12%, transparent) 1px,
+        color-mix(in oklab, var(--color-teal-500) 12%, transparent) 1px,
         transparent 1px
       ),
       linear-gradient(
-        color-mix(in oklab, var(--color-teal-700) 12%, transparent) 1px,
+        color-mix(in oklab, var(--color-teal-500) 12%, transparent) 1px,
         transparent 1px
       );
     background-position: 4px 4px;

@@ -273,7 +273,7 @@
 </svelte:head>
 
 <div
-  class="h-screen overflow-hidden bg-stone-100 font-sans text-slate-950 dark:bg-zinc-950 dark:text-zinc-100">
+  class="h-screen overflow-hidden bg-white font-sans text-slate-800 dark:bg-zinc-950 dark:text-zinc-100">
   <div
     class="grid h-full min-h-0 grid-cols-[236px_minmax(0,1fr)_236px] max-[1120px]:grid-cols-[236px_minmax(0,1fr)] max-[760px]:grid-cols-1">
     <FilterSidebar
