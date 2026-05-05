@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { generate } from './generate.js';
+import { avaloniaGenerator } from './generators/avalonia.js';
 import { svelteGenerator } from './generators/svelte.js';
 import { scanIcons } from './scan.js';
 import { syncSource } from './sync.js';
@@ -15,10 +16,13 @@ function main() {
     case 'generate': {
       const generatorName = process.argv[3] || 'svelte';
       const icons = scanIcons();
-      switch (generatorName) {
-        case 'svelte':
-          generate(svelteGenerator, icons);
-          break;
+        switch (generatorName) {
+          case 'avalonia':
+            generate(avaloniaGenerator, icons);
+            break;
+          case 'svelte':
+            generate(svelteGenerator, icons);
+            break;
         default:
           console.error(`Unknown generator: ${generatorName}`);
           process.exit(1);

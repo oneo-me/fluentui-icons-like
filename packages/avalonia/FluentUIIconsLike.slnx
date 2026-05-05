@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/_/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+    <File Path="NuGet.config" />
+  </Folder>
+  <Project Path="FluentUIIconsLike.Generator\FluentUIIconsLike.Generator.csproj" />
+  <Project Path="FluentUIIconsLikeDemo\FluentUIIconsLikeDemo.csproj" />
+  <Project Path="FluentUIIconsLike\FluentUIIconsLike.csproj" />
+</Solution>
