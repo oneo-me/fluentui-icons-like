@@ -9,6 +9,6 @@
         <IsAotCompatible>true</IsAotCompatible>
         <AnalysisMode>All</AnalysisMode>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-        <Version>2.0.0-beta</Version>
+        <Version>2.0.0-preview.0</Version>
     </PropertyGroup>
 </Project>

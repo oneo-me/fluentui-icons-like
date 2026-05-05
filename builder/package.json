@@ -7,11 +7,10 @@
     "builder": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
     "check": "biome check --write",
-    "sync": "node dist/index.js sync",
-    "generate": "node dist/index.js generate"
+    "sync": "tsc && node dist/index.js sync",
+    "generate": "tsc && node dist/index.js generate",
+    "pack": "tsc && node dist/index.js pack"
   },
   "packageManager": "pnpm@10.23.0",
   "devDependencies": {

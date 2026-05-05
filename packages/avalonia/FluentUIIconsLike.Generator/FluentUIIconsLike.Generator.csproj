@@ -8,7 +8,6 @@
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <NoWarn>NU5128;RS2008</NoWarn>
         <PackageId>ONEO.FluentUIIconsLike.Generator</PackageId>
-        <Version>2.0.0-beta.0</Version>
         <Authors>ONEO</Authors>
         <Description>Source generator for ONEO FluentUI Icons Like on Avalonia. Generates icon data for referenced symbols.</Description>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
