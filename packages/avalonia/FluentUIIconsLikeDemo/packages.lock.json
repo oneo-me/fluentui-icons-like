@@ -184,7 +184,7 @@
         "resolved": "0.92.0",
         "contentHash": "h7IMakm0PF2jxiagoysoAjrzzLQ0UBdnSXQL5kb17YW0Fvyo12Tg96A99QkzwktWRrd7H+Uw9EzjasNLUfGYlA=="
       },
-      "fluentuiiconslike": {
+      "ONEO.FluentUIIconsLike": {
         "type": "Project",
         "dependencies": {
           "Avalonia": "[12.0.2, )"

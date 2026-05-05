@@ -7,6 +7,17 @@
         <BuildOutputTargetFolder>analyzers/dotnet/cs</BuildOutputTargetFolder>
         <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <NoWarn>NU5128;RS2008</NoWarn>
+        <PackageId>ONEO.FluentUIIconsLike.Generator</PackageId>
+        <Version>2.0.0-beta.0</Version>
+        <Authors>ONEO</Authors>
+        <Description>Source generator for ONEO FluentUI Icons Like on Avalonia. Generates icon data for referenced symbols.</Description>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/oneo-me/fluentui-icons-like#readme</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/oneo-me/fluentui-icons-like.git</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>avalonia;fluentui;fluent-ui;fluent;icons;icon;source-generator;roslyn;microsoft;system-icons</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis.CSharp" PrivateAssets="all" />
@@ -15,5 +26,8 @@
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Include="Assets\fluent-icons.json" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="../../../README.md" Pack="true" PackagePath="README.md" />
     </ItemGroup>
 </Project>
