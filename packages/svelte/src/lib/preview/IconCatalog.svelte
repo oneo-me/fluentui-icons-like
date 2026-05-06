@@ -10,6 +10,8 @@
     selectedSize,
     selectedStyle,
     selectedColor = $bindable(),
+    effectiveSelectedColor,
+    colorPickerValue,
     selectedScale,
     gridEl = $bindable(),
     totalRows,
@@ -30,6 +32,8 @@
     selectedSize: number;
     selectedStyle: IconStyle;
     selectedColor: string;
+    effectiveSelectedColor: string;
+    colorPickerValue: string;
     selectedScale: number;
     gridEl: HTMLDivElement | null;
     totalRows: number;
@@ -45,11 +49,11 @@
 
   const scales = [1, 2, 3];
   const iconItemBase =
-    'grid w-full cursor-pointer place-items-center overflow-hidden rounded-md border border-teal-900/15 bg-white/70 p-0 text-slate-800 transition-[transform,border-color,background,box-shadow] duration-150 ease-out dark:border-teal-300/15 dark:bg-zinc-900/70 dark:text-zinc-100';
+    'grid w-full cursor-pointer place-items-center overflow-hidden rounded-md border border-border bg-card/76 p-0 text-foreground shadow-xs transition-[transform,border-color,background,box-shadow,color] duration-150 ease-out';
   const iconItemActive =
-    '-translate-y-px !border-teal-600 bg-white shadow-md ring-2 ring-teal-600/30 dark:!border-teal-400 dark:bg-zinc-950 dark:ring-teal-400/30';
+    '-translate-y-px !border-primary/55 bg-background shadow-lg ring-2 ring-ring/24';
   const iconItemIdle =
-    'hover:-translate-y-px hover:border-teal-600 hover:bg-white hover:shadow-md dark:hover:border-teal-400 dark:hover:bg-zinc-950';
+    'hover:-translate-y-px hover:border-primary/40 hover:bg-background hover:shadow-md';
 
   let iconBorderRadius = $derived(
     selectedScale === 3 ? '14px' : selectedScale === 2 ? '10px' : '6px',
@@ -61,11 +65,11 @@
 
   function scaleButtonClass(scale: number) {
     const base =
-      'h-8 min-w-8 cursor-pointer rounded-md border px-2 text-[11px] font-extrabold transition-colors';
+      'h-8 min-w-8 cursor-pointer rounded-md border px-2 text-[11px] font-extrabold transition-[border-color,background-color,color,box-shadow]';
     const active =
-      'border-teal-600 bg-teal-50 text-teal-900 shadow-inner dark:border-teal-400 dark:bg-teal-950/60 dark:text-teal-100';
+      'border-primary/55 bg-primary/12 text-primary shadow-[inset_0_1px_0_color-mix(in_oklab,var(--color-primary)_18%,transparent)]';
     const idle =
-      'border-teal-900/15 bg-white text-slate-800 hover:border-teal-600 hover:text-teal-800 dark:border-teal-300/15 dark:bg-zinc-950 dark:text-zinc-100 dark:hover:border-teal-400 dark:hover:text-teal-200';
+      'border-border bg-card text-foreground hover:border-primary/40 hover:bg-accent hover:text-accent-foreground';
 
     return `${base} ${selectedScale === scale ? active : idle}`;
   }
@@ -73,23 +77,24 @@
 
 <main class="flex min-h-0 min-w-0 flex-col">
   <div
-    class="grid min-h-[52px] grid-cols-[minmax(0,1fr)_256px] items-center gap-2 border-b border-teal-900/15 bg-white px-2.5 py-2 dark:border-teal-300/15 dark:bg-zinc-900/60">
+    class="grid min-h-[52px] grid-cols-[minmax(0,1fr)_256px] items-center gap-2 border-b border-border bg-card/88 px-2.5 py-2 backdrop-blur-sm">
     <label class="block min-w-0">
       <input
-        class="h-9 w-full min-w-0 rounded-md border border-teal-900/15 bg-white px-2.5 text-slate-800 shadow-sm outline-none focus:border-teal-600 focus:ring-3 focus:ring-teal-600/20 dark:border-teal-300/15 dark:bg-zinc-950 dark:text-zinc-100 dark:focus:border-teal-400 dark:focus:ring-teal-400/20"
+        class="h-9 w-full min-w-0 rounded-md border border-input bg-background px-2.5 text-foreground shadow-sm outline-none focus:border-ring focus:ring-3 focus:ring-ring/20"
         type="search"
         bind:value={keyword}
         placeholder={`Searching metadata from ${leftFilteredCount.toLocaleString()} icons...`} />
     </label>
     <div class="flex min-w-0 items-center justify-end gap-2">
       <label
-        class="grid size-9 cursor-pointer place-items-center rounded-md border border-teal-900/15 bg-white shadow-sm dark:border-teal-300/15 dark:bg-zinc-950"
+        class="grid size-9 cursor-pointer place-items-center rounded-md border border-input bg-background shadow-sm"
         title="Choose icon color">
         <span class="sr-only">Choose icon color</span>
         <input
           class="size-7 cursor-pointer rounded border-0 bg-transparent p-0"
           type="color"
-          bind:value={selectedColor}
+          value={colorPickerValue}
+          oninput={(event) => (selectedColor = event.currentTarget.value)}
           aria-label="Choose icon color" />
       </label>
       <div class="grid grid-cols-3 gap-1" aria-label="Icon display scale">
@@ -112,8 +117,8 @@
     onscroll={onScroll}>
     {#if filtered.length === 0}
       <div
-        class="grid min-h-[220px] place-items-center content-center gap-2 text-center text-slate-500 dark:text-zinc-400">
-        <strong class="font-serif text-xl text-slate-800 dark:text-zinc-100"
+        class="grid min-h-[220px] place-items-center content-center gap-2 text-center text-muted-foreground">
+        <strong class="font-serif text-xl text-foreground"
           >No icons found</strong
         >
         <span>Try another keyword, size, or style.</span>
@@ -130,7 +135,7 @@
           <button
             type="button"
             class={iconClass(icon)}
-            style="height: {itemSize}px; border-radius: {iconBorderRadius}; color: {selectedColor}"
+            style="height: {itemSize}px; border-radius: {iconBorderRadius}; color: {effectiveSelectedColor}"
             title={icon.description || icon.name}
             onclick={() => onSelectIcon(icon)}>
             <Comp size={selectedSize * selectedScale} style={selectedStyle} />

@@ -2,7 +2,8 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+    <link rel="icon" type="image/png" href="%sveltekit.assets%/logo.png" />
+    <link rel="apple-touch-icon" href="%sveltekit.assets%/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="index, follow" />
     <meta
@@ -13,9 +14,21 @@
       name="theme-color"
       content="#09090b"
       media="(prefers-color-scheme: dark)" />
+    <script>
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+
+      function applyThemeClass(event) {
+        document.documentElement.classList.toggle('dark', event.matches);
+      }
+
+      applyThemeClass(media);
+      media.addEventListener('change', applyThemeClass);
+    </script>
     <meta property="og:site_name" content="FluentUI Icons Like" />
     <meta property="og:type" content="website" />
+    <meta property="og:image" content="%sveltekit.assets%/logo.png" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="%sveltekit.assets%/logo.png" />
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover">

@@ -16,6 +16,7 @@
         <RepositoryType>git</RepositoryType>
         <PackageTags>avalonia;fluentui;fluent-ui;fluent;icons;icon;source-generator;roslyn;microsoft;system-icons</PackageTags>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>logo.png</PackageIcon>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
     </PropertyGroup>
     <ItemGroup>
@@ -28,5 +29,6 @@
     </ItemGroup>
     <ItemGroup>
         <None Include="../../../README.md" Pack="true" PackagePath="README.md" />
+        <None Include="../../../logo.png" Pack="true" PackagePath="logo.png" />
     </ItemGroup>
 </Project>

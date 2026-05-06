@@ -11,7 +11,8 @@
   const PADDING = 10;
   const MIN_OVERSCAN_ROWS = 8;
   const MAX_OVERSCAN_ROWS = 24;
-  const DEFAULT_ICON_COLOR = '#333333';
+  const DEFAULT_ICON_COLOR = '';
+  const THEME_ICON_COLOR = 'var(--color-foreground)';
 
   const VALID_STYLES = new Set<IconStyle>(['Filled', 'Light', 'Regular']);
   const VALID_SCALES = new Set([1, 2, 3]);
@@ -63,6 +64,7 @@
   let selectedStyle = $state<IconStyle>('Regular');
   let selectedMetaphor = $state('');
   let selectedColor = $state(DEFAULT_ICON_COLOR);
+  let themeIconColor = $state('#333333');
   let selectedScale = $state(1);
   let metaphorKeyword = $state('');
   let selectedIcon = $state<IconEntry | null>(null);
@@ -129,6 +131,8 @@
   );
   let visibleIcons = $derived(filtered.slice(startIndex, endIndex));
   let itemsTop = $derived(startRow * rowHeight);
+  let effectiveSelectedColor = $derived(selectedColor || THEME_ICON_COLOR);
+  let colorPickerValue = $derived(selectedColor || themeIconColor);
 
   function getMetaphors(icon: IconEntry) {
     return icon.metaphor
@@ -206,8 +210,27 @@
     if (nextScrollRow !== scrollRow) scrollRow = nextScrollRow;
   }
 
+  function syncThemeIconColor() {
+    const color = getComputedStyle(document.documentElement)
+      .getPropertyValue('--color-foreground')
+      .trim();
+
+    if (color) themeIconColor = color;
+  }
+
   onMount(() => {
     source = registry;
+
+    syncThemeIconColor();
+
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const onThemeChange = () => syncThemeIconColor();
+    const observer = new MutationObserver(() => syncThemeIconColor());
+    media.addEventListener('change', onThemeChange);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
+    });
 
     const params = readParams($page.url);
     keyword = params.keyword;
@@ -226,6 +249,11 @@
     }
 
     urlSyncReady = true;
+
+    return () => {
+      media.removeEventListener('change', onThemeChange);
+      observer.disconnect();
+    };
   });
 
   $effect(() => {
@@ -298,8 +326,8 @@
 </svelte:head>
 
 <div
-  class="h-screen overflow-hidden bg-white font-sans text-slate-800 dark:bg-zinc-950 dark:text-zinc-100">
-  <div class="grid h-full min-h-0 grid-cols-[236px_minmax(0,1fr)_236px]">
+  class="min-h-screen overflow-hidden bg-background font-sans text-foreground">
+  <div class="grid h-screen min-h-0 grid-cols-[236px_minmax(0,1fr)_236px] bg-background">
     <FilterSidebar
       iconCount={source.length}
       {allSizes}
@@ -328,16 +356,18 @@
       padding={PADDING}
       {columnsPerRow}
       {itemsTop}
-      {itemSize}
-      {onScroll}
-      bind:selectedColor
-      onSelectScale={selectScale}
-      onSelectIcon={selectIcon} />
+        {itemSize}
+        {onScroll}
+        bind:selectedColor
+        {colorPickerValue}
+        effectiveSelectedColor={effectiveSelectedColor}
+        onSelectScale={selectScale}
+        onSelectIcon={selectIcon} />
 
     <IconDetails
       {selectedIcon}
       {selectedSize}
       {selectedStyle}
-      {selectedColor} />
+      selectedColor={effectiveSelectedColor} />
   </div>
 </div>
