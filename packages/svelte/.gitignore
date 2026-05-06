@@ -25,4 +25,4 @@ vite.config.ts.timestamp-*
 
 # Gen
 src/lib/icons
-src/lib/index.ts
+src/lib/preview/registry.ts

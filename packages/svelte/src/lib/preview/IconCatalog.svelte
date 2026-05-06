@@ -1,5 +1,7 @@
 <script lang="ts">
-  import type { IconEntry, IconStyle } from '$lib/index.js';
+  import type { IconStyle } from '$lib/index.js';
+  import LazyIcon from './LazyIcon.svelte';
+  import type { PreviewIconEntry } from './registry.js';
 
   let {
     keyword = $bindable(),
@@ -26,9 +28,9 @@
   }: {
     keyword: string;
     leftFilteredCount: number;
-    filtered: IconEntry[];
-    visibleIcons: IconEntry[];
-    selectedIcon: IconEntry | null;
+    filtered: PreviewIconEntry[];
+    visibleIcons: PreviewIconEntry[];
+    selectedIcon: PreviewIconEntry | null;
     selectedSize: number;
     selectedStyle: IconStyle;
     selectedColor: string;
@@ -44,7 +46,7 @@
     itemSize: number;
     onScroll: () => void;
     onSelectScale: (scale: number) => void;
-    onSelectIcon: (icon: IconEntry) => void;
+    onSelectIcon: (icon: PreviewIconEntry) => void;
   } = $props();
 
   const scales = [1, 2, 3];
@@ -59,7 +61,7 @@
     selectedScale === 3 ? '14px' : selectedScale === 2 ? '10px' : '6px',
   );
 
-  function iconClass(icon: IconEntry) {
+  function iconClass(icon: PreviewIconEntry) {
     return `${iconItemBase} ${selectedIcon?.key === icon.key ? iconItemActive : iconItemIdle}`;
   }
 
@@ -131,14 +133,16 @@
         class="absolute top-0 right-2.5 left-2.5 grid content-start gap-1.5 will-change-transform"
         style="grid-template-columns: repeat({columnsPerRow}, minmax(0, 1fr)); transform: translateY({itemsTop + padding}px)">
         {#each visibleIcons as icon (icon.key)}
-          {@const Comp = icon.value}
           <button
             type="button"
             class={iconClass(icon)}
             style="height: {itemSize}px; border-radius: {iconBorderRadius}; color: {effectiveSelectedColor}"
             title={icon.description || icon.name}
             onclick={() => onSelectIcon(icon)}>
-            <Comp size={selectedSize * selectedScale} style={selectedStyle} />
+            <LazyIcon
+              {icon}
+              size={selectedSize * selectedScale}
+              style={selectedStyle} />
           </button>
         {/each}
       </div>

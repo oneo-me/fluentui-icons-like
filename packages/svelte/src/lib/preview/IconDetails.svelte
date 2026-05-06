@@ -3,7 +3,9 @@
   import CodeIcon from '$lib/icons/Code.svelte';
   import CopyIcon from '$lib/icons/Copy.svelte';
   import ImageIcon from '$lib/icons/Image.svelte';
-  import type { IconEntry, IconStyle } from '$lib/index.js';
+  import type { IconStyle } from '$lib/index.js';
+  import LazyIcon from './LazyIcon.svelte';
+  import type { PreviewIconEntry } from './registry.js';
 
   let {
     selectedIcon,
@@ -11,7 +13,7 @@
     selectedStyle,
     selectedColor,
   }: {
-    selectedIcon: IconEntry | null;
+    selectedIcon: PreviewIconEntry | null;
     selectedSize: number;
     selectedStyle: IconStyle;
     selectedColor: string;
@@ -160,7 +162,6 @@
   class="overflow-y-auto border-l border-border bg-card/90 py-3 text-card-foreground backdrop-blur-sm"
   aria-label="Selected icon details">
   {#if selectedIcon}
-    {@const DetailComp = selectedIcon.value}
     <dl class="m-0 grid">
       <div class="grid -mt-3">
         <dt class="sr-only">Preview</dt>
@@ -169,7 +170,8 @@
             class="grid overflow-hidden border-b border-border shadow-inner"
             style="color: {selectedColor}">
             <div class="preview-grid grid aspect-square w-full place-items-center bg-background">
-              <DetailComp
+              <LazyIcon
+                icon={selectedIcon}
                 size={120}
                 style={selectedStyle}
                 title={selectedIcon.name} />
@@ -215,7 +217,8 @@
             aria-hidden="true"
             bind:this={sourcePreviewEl}
             style="color: {selectedColor}">
-            <DetailComp
+            <LazyIcon
+              icon={selectedIcon}
               size={selectedSize}
               style={selectedStyle}
               title={selectedIcon.name} />

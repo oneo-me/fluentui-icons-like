@@ -30,31 +30,33 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "vite build && npm run prepack",
+    "build": "vite build && node scripts/fix-sveltekit-server-side-effects.mjs",
     "preview": "vite preview",
     "prepare": "svelte-kit sync || echo ''",
     "prepack": "svelte-kit sync && svelte-package -i src/lib/icons && publint",
     "svelte-check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check": "biome check --write",
     "pack": "pnpm pack",
-    "publish": "pnpm publish"
+    "publish": "pnpm publish",
+    "deploy": "pnpm build && wrangler deploy"
   },
   "peerDependencies": {
     "svelte": "^5.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.14",
-    "@sveltejs/adapter-auto": "^7.0.1",
-    "@sveltejs/kit": "^2.59.0",
+    "@sveltejs/adapter-cloudflare": "^7.2.8",
+    "@sveltejs/kit": "^2.59.1",
     "@sveltejs/package": "^2.5.7",
-    "@sveltejs/vite-plugin-svelte": "^7.0.0",
+    "@sveltejs/vite-plugin-svelte": "^7.1.1",
     "@tailwindcss/vite": "^4.2.4",
-    "publint": "^0.3.18",
+    "publint": "^0.3.19",
     "svelte": "^5.55.5",
-    "svelte-check": "^4.4.7",
+    "svelte-check": "^4.4.8",
     "tailwindcss": "^4.2.4",
     "typescript": "^6.0.3",
-    "vite": "^8.0.10"
+    "vite": "^8.0.10",
+    "wrangler": "^4.88.0"
   },
   "publishConfig": {
     "access": "public"

@@ -2,7 +2,8 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import { type IconEntry, type IconStyle, registry } from '$lib/index.js';
+  import type { IconStyle } from '$lib/index.js';
+  import type { PreviewIconEntry } from '$lib/preview/registry.js';
   import FilterSidebar from '$lib/preview/FilterSidebar.svelte';
   import IconCatalog from '$lib/preview/IconCatalog.svelte';
   import IconDetails from '$lib/preview/IconDetails.svelte';
@@ -58,7 +59,7 @@
     return p;
   }
 
-  let source = $state<IconEntry[]>([]);
+  let source = $state<PreviewIconEntry[]>([]);
   let keyword = $state('');
   let selectedSize = $state(20);
   let selectedStyle = $state<IconStyle>('Regular');
@@ -67,7 +68,7 @@
   let themeIconColor = $state('#333333');
   let selectedScale = $state(1);
   let metaphorKeyword = $state('');
-  let selectedIcon = $state<IconEntry | null>(null);
+  let selectedIcon = $state<PreviewIconEntry | null>(null);
 
   let gridEl = $state<HTMLDivElement | null>(null);
   let containerWidth = $state(900);
@@ -134,13 +135,13 @@
   let effectiveSelectedColor = $derived(selectedColor || THEME_ICON_COLOR);
   let colorPickerValue = $derived(selectedColor || themeIconColor);
 
-  function getMetaphors(icon: IconEntry) {
+  function getMetaphors(icon: PreviewIconEntry) {
     return icon.metaphor
       .map((metaphor) => metaphor.trim())
       .filter((metaphor) => metaphor.length > 0);
   }
 
-  function getSearchText(icon: IconEntry) {
+  function getSearchText(icon: PreviewIconEntry) {
     return [
       icon.key,
       icon.name,
@@ -154,7 +155,7 @@
       .toLowerCase();
   }
 
-  function matchesSearch(icon: IconEntry) {
+  function matchesSearch(icon: PreviewIconEntry) {
     const terms = keyword.trim().toLowerCase().split(/\s+/).filter(Boolean);
 
     return (
@@ -163,7 +164,7 @@
     );
   }
 
-  function matchesLeftFilters(icon: IconEntry) {
+  function matchesLeftFilters(icon: PreviewIconEntry) {
     const matchesSize = icon.sizes.includes(selectedSize);
     const matchesStyle = icon.styles.includes(selectedStyle);
     const matchesMetaphor =
@@ -199,7 +200,7 @@
     resetScroll();
   }
 
-  function selectIcon(icon: IconEntry) {
+  function selectIcon(icon: PreviewIconEntry) {
     selectedIcon = icon;
   }
 
@@ -218,7 +219,8 @@
     if (color) themeIconColor = color;
   }
 
-  onMount(() => {
+  onMount(async () => {
+    const { registry } = await import('$lib/preview/registry.js');
     source = registry;
 
     syncThemeIconColor();
