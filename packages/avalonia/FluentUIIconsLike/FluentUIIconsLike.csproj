@@ -4,16 +4,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <PackageId>ONEO.FluentUIIconsLike</PackageId>
-        <Authors>ONEO</Authors>
         <Description>Microsoft Fluent UI System Icons as Avalonia controls. Lightweight icon rendering for Avalonia applications.</Description>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/oneo-me/fluentui-icons-like#readme</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/oneo-me/fluentui-icons-like.git</RepositoryUrl>
-        <RepositoryType>git</RepositoryType>
         <PackageTags>avalonia;fluentui;fluent-ui;fluent;icons;icon;svg;microsoft;system-icons</PackageTags>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageIcon>logo.png</PackageIcon>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
     </PropertyGroup>
     <ItemGroup>
         <PackageReference Include="Avalonia" />

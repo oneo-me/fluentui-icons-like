@@ -2,5 +2,5 @@ namespace FluentUIIconsLike;
 
 public interface IFluentIconDataProvider
 {
-    bool TryGetIcon(FluentIconSymbol symbol, int size, FluentIconStyle style, out FluentIconVariantData? data);
+    bool TryGetIcon(FluentIconSymbol symbol, FluentIconSize size, FluentIconStyle style, out FluentIconVariantData? data);
 }

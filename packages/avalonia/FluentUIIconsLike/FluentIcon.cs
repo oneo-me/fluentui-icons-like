@@ -8,14 +8,11 @@ namespace FluentUIIconsLike;
 
 public class FluentIcon : Control
 {
-    const string ErrorViewBox = "0 0 24 24";
-    const string ErrorPathData = "M12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2ZM12 6.75C12.4142 6.75 12.75 7.08579 12.75 7.5V12.25C12.75 12.6642 12.4142 13 12 13C11.5858 13 11.25 12.6642 11.25 12.25V7.5C11.25 7.08579 11.5858 6.75 12 6.75ZM12 16.25C12.5523 16.25 13 16.6977 13 17.25C13 17.8023 12.5523 18.25 12 18.25C11.4477 18.25 11 17.8023 11 17.25C11 16.6977 11.4477 16.25 12 16.25Z";
-
     public static readonly StyledProperty<FluentIconSymbol> SymbolProperty =
         AvaloniaProperty.Register<FluentIcon, FluentIconSymbol>(nameof(Symbol));
 
-    public static readonly StyledProperty<int> SizeProperty =
-        AvaloniaProperty.Register<FluentIcon, int>(nameof(Size), 24);
+    public static readonly StyledProperty<FluentIconSize> SizeProperty =
+        AvaloniaProperty.Register<FluentIcon, FluentIconSize>(nameof(Size), FluentIconSize.Size24);
 
     public static readonly StyledProperty<FluentIconStyle> StyleProperty =
         AvaloniaProperty.Register<FluentIcon, FluentIconStyle>(nameof(Style), FluentIconStyle.Regular);
@@ -43,7 +40,7 @@ public class FluentIcon : Control
         set => SetValue(SymbolProperty, value);
     }
 
-    public int Size
+    public FluentIconSize Size
     {
         get => GetValue(SizeProperty);
         set => SetValue(SizeProperty, value);
@@ -69,8 +66,9 @@ public class FluentIcon : Control
 
     protected override Size MeasureOverride(Size availableSize)
     {
-        var width = double.IsNaN(Width) ? Size : Width;
-        var height = double.IsNaN(Height) ? Size : Height;
+        var iconSize = GetResolvedSize();
+        var width = double.IsNaN(Width) ? iconSize : Width;
+        var height = double.IsNaN(Height) ? iconSize : Height;
         return new(width, height);
     }
 
@@ -88,8 +86,21 @@ public class FluentIcon : Control
         ArgumentNullException.ThrowIfNull(context);
         base.Render(context);
 
-        var brush = _isError ? Brushes.Red : Foreground;
-        if (_geometry is null || brush is null || Bounds.Width <= 0 || Bounds.Height <= 0)
+        if (Bounds.Width <= 0 || Bounds.Height <= 0)
+            return;
+
+        if (_isError)
+        {
+            var pen = new Pen(Brushes.Red, 1.5);
+            var rect = new Rect(Bounds.Size).Deflate(0.75);
+            context.DrawRectangle(null, pen, rect);
+            context.DrawLine(pen, rect.TopLeft, rect.BottomRight);
+            context.DrawLine(pen, rect.TopRight, rect.BottomLeft);
+            return;
+        }
+
+        var brush = Foreground;
+        if (_geometry is null || brush is null)
             return;
 
         var sourceSize = _viewBox.Size;
@@ -118,16 +129,20 @@ public class FluentIcon : Control
         _viewBox = default;
         _isError = false;
 
-        if (!FluentIconRegistry.Current.TryGetIcon(Symbol, Size, Style, out var data) || data is null)
+        var size = Size == FluentIconSize.None ? FluentIconSize.Size24 : Size;
+        if (!FluentIconRegistry.Current.TryGetIcon(Symbol, size, Style, out var data) || data is null)
         {
             _isError = true;
-            _viewBox = ParseViewBox(ErrorViewBox);
-            _geometry = _geometryCache.GetOrAdd("__error__", _ => Geometry.Parse(ErrorPathData));
             return;
         }
 
         _viewBox = ParseViewBox(data.ViewBox);
         _geometry = _geometryCache.GetOrAdd($"{Symbol}:{data.Size}:{data.Style}", _ => Geometry.Parse(data.PathData));
+    }
+
+    int GetResolvedSize()
+    {
+        return Size == FluentIconSize.None ? (int)FluentIconSize.Size24 : (int)Size;
     }
 
     static Vector CalculateScale(Size targetSize, Size sourceSize, Stretch stretch)

@@ -64,10 +64,10 @@ Use the icon control in `axaml`:
 ```xml
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:icons="clr-namespace:FluentUIIconsLike;assembly=FluentUIIconsLike">
+        xmlns:icons="https://github.com/oneo-me/fluentui-icons-like">
   <StackPanel Spacing="12">
-    <icons:FluentIcon Symbol="AccessTime" Size="24" Style="Regular" Foreground="DodgerBlue" />
-    <icons:FluentIcon Symbol="Accessibility" Size="24" Style="Filled" Foreground="MediumSeaGreen" />
+    <icons:FluentIcon Symbol="AccessTime" Size="Size24" Style="Regular" Foreground="DodgerBlue" />
+    <icons:FluentIcon Symbol="Accessibility" Size="Size24" Style="Filled" Foreground="MediumSeaGreen" />
   </StackPanel>
 </Window>
 ```

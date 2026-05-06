@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:icons="clr-namespace:FluentUIIconsLike;assembly=FluentUIIconsLike"
+        xmlns:icons="https://github.com/oneo-me/fluentui-icons-like"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="FluentUIIconsLikeDemo.MainWindow"
         Title="FluentUIIconsLikeDemo" Width="520" Height="460">
@@ -12,23 +12,23 @@
             <TextBlock Text="Generator trims the icon payload to only the referenced symbols." />
             <WrapPanel ItemHeight="72" ItemWidth="120">
                 <StackPanel Spacing="8">
-                    <icons:FluentIcon Symbol="AccessTime" Size="24" Style="Regular" Width="32" Height="32" Foreground="DodgerBlue" />
+                    <icons:FluentIcon Symbol="AccessTime" Size="Size24" Style="Regular" Width="32" Height="32" Foreground="DodgerBlue" />
                     <TextBlock HorizontalAlignment="Center" Text="Access Time" />
                 </StackPanel>
                 <StackPanel Spacing="8">
-                    <icons:FluentIcon Symbol="Accessibility" Size="24" Style="Filled" Width="32" Height="32" Foreground="MediumSeaGreen" />
+                    <icons:FluentIcon Symbol="Accessibility" Size="Size24" Style="Filled" Width="32" Height="32" Foreground="MediumSeaGreen" />
                     <TextBlock HorizontalAlignment="Center" Text="Accessibility" />
                 </StackPanel>
                 <StackPanel Spacing="8">
-                    <icons:FluentIcon Symbol="Add" Size="20" Style="Regular" Width="32" Height="32" Foreground="DarkOrange" />
+                    <icons:FluentIcon Symbol="Add" Size="Size20" Style="Regular" Width="32" Height="32" Foreground="DarkOrange" />
                     <TextBlock HorizontalAlignment="Center" Text="Add" />
                 </StackPanel>
                 <StackPanel Spacing="8">
-                    <icons:FluentIcon Symbol="Airplane" Size="24" Style="Filled" Width="32" Height="32" Foreground="MediumPurple" />
+                    <icons:FluentIcon Symbol="Airplane" Size="Size24" Style="Filled" Width="32" Height="32" Foreground="MediumPurple" />
                     <TextBlock HorizontalAlignment="Center" Text="Airplane" />
                 </StackPanel>
                 <StackPanel Spacing="8">
-                    <icons:FluentIcon Symbol="Airplane" Size="12" Style="Light" Width="32" Height="32" />
+                    <icons:FluentIcon Symbol="Airplane" Size="Size12" Style="Light" Width="32" Height="32" />
                     <TextBlock HorizontalAlignment="Center" Text="Error Fallback" />
                 </StackPanel>
             </WrapPanel>

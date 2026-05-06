@@ -113,7 +113,7 @@ sealed class Generator : IIncrementalGenerator
                  {{entries}}
                      };
 
-                     public bool TryGetIcon(global::FluentUIIconsLike.FluentIconSymbol symbol, int size, global::FluentUIIconsLike.FluentIconStyle style, out global::FluentUIIconsLike.FluentIconVariantData? data)
+                     public bool TryGetIcon(global::FluentUIIconsLike.FluentIconSymbol symbol, global::FluentUIIconsLike.FluentIconSize size, global::FluentUIIconsLike.FluentIconStyle style, out global::FluentUIIconsLike.FluentIconVariantData? data)
                      {
                          data = null;
                          if (!Map.TryGetValue(symbol, out var iconData))
@@ -123,7 +123,7 @@ sealed class Generator : IIncrementalGenerator
 
                          foreach (var variant in iconData.Variants)
                          {
-                             if (variant.Size == size && variant.Style == style)
+                             if (variant.Size == (int)size && variant.Style == style)
                              {
                                  data = variant;
                                  return true;

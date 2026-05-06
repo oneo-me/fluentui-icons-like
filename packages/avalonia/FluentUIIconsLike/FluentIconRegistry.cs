@@ -8,7 +8,7 @@ public static class FluentIconRegistry
     {
         public static EmptyFluentIconDataProvider Instance { get; } = new();
 
-        public bool TryGetIcon(FluentIconSymbol symbol, int size, FluentIconStyle style, out FluentIconVariantData? data)
+        public bool TryGetIcon(FluentIconSymbol symbol, FluentIconSize size, FluentIconStyle style, out FluentIconVariantData? data)
         {
             data = null;
             return false;
