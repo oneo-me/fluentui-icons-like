@@ -35,13 +35,17 @@ Use icons in a Svelte component:
 
 ```svelte
 <script lang="ts">
-  import { Access_Time, Accessibility, Add } from '@oneo/fluentui-icons-like';
+  import {
+    FluentIcon_Access_Time,
+    FluentIcon_Accessibility,
+    FluentIcon_Add,
+  } from '@oneo/fluentui-icons-like';
 </script>
 
 <div style="display:flex;gap:12px;align-items:center;">
-  <Access_Time size={24} style="Regular" />
-  <Accessibility size={24} style="Filled" />
-  <Add size={20} style="Regular" />
+  <FluentIcon_Access_Time size={24} style="Regular" />
+  <FluentIcon_Accessibility size={24} style="Filled" />
+  <FluentIcon_Add size={20} style="Regular" />
 </div>
 ```
 

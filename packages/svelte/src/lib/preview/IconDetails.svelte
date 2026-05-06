@@ -1,8 +1,8 @@
 <script lang="ts">
-  import ArrowDownloadIcon from '$lib/icons/Arrow_Download.svelte';
-  import CodeIcon from '$lib/icons/Code.svelte';
-  import CopyIcon from '$lib/icons/Copy.svelte';
-  import ImageIcon from '$lib/icons/Image.svelte';
+  import ArrowDownloadIcon from '$lib/icons/FluentIcon_Arrow_Download.svelte';
+  import CodeIcon from '$lib/icons/FluentIcon_Code.svelte';
+  import CopyIcon from '$lib/icons/FluentIcon_Copy.svelte';
+  import ImageIcon from '$lib/icons/FluentIcon_Image.svelte';
   import LazyIcon from './LazyIcon.svelte';
   import type { PreviewIconEntry, PreviewIconStyle } from './registry.js';
 

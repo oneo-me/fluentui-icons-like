@@ -5,4 +5,5 @@ publish
 #AI
 .agents
 .codex
+.cursor
 AGENTS.md

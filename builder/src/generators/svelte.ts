@@ -20,11 +20,17 @@ const PREVIEW_REGISTRY_PATH = resolve(
   'registry.ts',
 );
 
+const COMPONENT_PREFIX = 'FluentIcon_';
+
+function getComponentName(icon: IconDefinition): string {
+  return `${COMPONENT_PREFIX}${icon.key}`;
+}
+
 export const svelteGenerator: Generator = {
   name: 'svelte',
   generate(icons: IconDefinition[]) {
     const files = icons.map((icon) => ({
-      path: resolve(ICONS_DIR, `${icon.key}.svelte`),
+      path: resolve(ICONS_DIR, `${getComponentName(icon)}.svelte`),
       content: generateIcon(icon),
     }));
 
@@ -132,16 +138,16 @@ ${markup}
 }
 
 function generateIndex(icons: IconDefinition[]): string {
-  const filenames = icons.map((icon) => icon.key);
-  const sortedFilenames = [...filenames].sort(naturalCompare);
+  const componentNames = icons.map(getComponentName);
+  const sortedComponentNames = [...componentNames].sort(naturalCompare);
   const iconStyles = Array.from(
     new Set(icons.flatMap((icon) => icon.styles)),
   ).sort((a, b) => a.localeCompare(b));
 
-  const exports = sortedFilenames
+  const exports = sortedComponentNames
     .map(
-      (filename) =>
-        `export { default as ${filename} } from './${filename}.svelte';`,
+      (componentName) =>
+        `export { default as ${componentName} } from './${componentName}.svelte';`,
     )
     .join('\n');
 
@@ -181,7 +187,7 @@ function generatePreviewRegistry(icons: IconDefinition[]): string {
         singleton: icon.singleton,
       };
 
-      return `  { ...${JSON.stringify(metadata)}, load: () => import('../icons/${icon.key}.svelte') },`;
+      return `  { ...${JSON.stringify(metadata)}, load: () => import('../icons/${getComponentName(icon)}.svelte') },`;
     })
     .join('\n');
 
