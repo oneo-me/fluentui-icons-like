@@ -35,15 +35,15 @@ Use icons in a Svelte component:
 
 ```svelte
 <script lang="ts">
-  import FluentIcon_Access_Time from '@oneo/fluentui-icons-like/FluentIcon_Access_Time.svelte';
-  import FluentIcon_Accessibility from '@oneo/fluentui-icons-like/FluentIcon_Accessibility.svelte';
-  import FluentIcon_Add from '@oneo/fluentui-icons-like/FluentIcon_Add.svelte';
+  import FluentIconAccessTime from '@oneo/fluentui-icons-like/FluentIconAccessTime.svelte';
+  import FluentIconAccessibility from '@oneo/fluentui-icons-like/FluentIconAccessibility.svelte';
+  import FluentIconAdd from '@oneo/fluentui-icons-like/FluentIconAdd.svelte';
 </script>
 
 <div style="display:flex;gap:12px;align-items:center;">
-  <FluentIcon_Access_Time size={24} style="Regular" />
-  <FluentIcon_Accessibility size={24} style="Filled" />
-  <FluentIcon_Add size={20} style="Regular" />
+  <FluentIconAccessTime size={24} style="Regular" />
+  <FluentIconAccessibility size={24} style="Filled" />
+  <FluentIconAdd size={20} style="Regular" />
 </div>
 ```
 

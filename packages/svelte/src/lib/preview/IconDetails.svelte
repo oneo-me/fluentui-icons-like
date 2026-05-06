@@ -1,8 +1,8 @@
 <script lang="ts">
-  import ArrowDownloadIcon from '$lib/icons/FluentIcon_Arrow_Download.svelte';
-  import CodeIcon from '$lib/icons/FluentIcon_Code.svelte';
-  import CopyIcon from '$lib/icons/FluentIcon_Copy.svelte';
-  import ImageIcon from '$lib/icons/FluentIcon_Image.svelte';
+  import ArrowDownloadIcon from '$lib/icons/FluentIconArrowDownload.svelte';
+  import CodeIcon from '$lib/icons/FluentIconCode.svelte';
+  import CopyIcon from '$lib/icons/FluentIconCopy.svelte';
+  import ImageIcon from '$lib/icons/FluentIconImage.svelte';
   import LazyIcon from './LazyIcon.svelte';
   import type { PreviewIconEntry, PreviewIconStyle } from './registry.js';
 
@@ -18,8 +18,7 @@
     selectedColor: string;
   } = $props();
 
-  const detailRow =
-    'grid gap-1 py-1.5';
+  const detailRow = 'grid gap-1 py-1.5';
   const detailLabel =
     'text-[11px] font-extrabold tracking-[0.08em] text-muted-foreground uppercase';
   const detailValue =
@@ -30,6 +29,17 @@
     'copy-button inline-flex size-7 flex-none cursor-pointer items-center justify-center rounded-md bg-transparent p-0 text-[11px] font-extrabold text-card-foreground transition-[background-color,color,box-shadow] hover:bg-accent hover:text-accent-foreground';
   const actionButtonClass =
     'copy-button inline-flex h-9 min-w-0 cursor-pointer items-center justify-center gap-1.5 rounded-none border-0 bg-transparent px-0 text-[11px] font-extrabold text-card-foreground transition-[background-color,color] hover:bg-accent hover:text-accent-foreground';
+  const snippetCodeClass =
+    'm-0 min-w-0 flex-1 rounded border border-border/60 bg-secondary/50 px-2 py-1 font-mono text-[11px] leading-[1.55] [overflow-wrap:anywhere] text-card-foreground';
+  const snippetButtonClass =
+    'copy-button inline-flex size-7 flex-none cursor-pointer items-center justify-center self-start rounded-md bg-transparent p-0 text-[11px] font-extrabold text-card-foreground transition-[background-color,color,box-shadow] hover:bg-accent hover:text-accent-foreground';
+
+  type SnippetId = 'svelte-import' | 'svelte' | 'avalonia';
+
+  const SVELTE_DEFAULT_SIZE = 20;
+  const SVELTE_DEFAULT_STYLE: PreviewIconStyle = 'Regular';
+  const AVALONIA_DEFAULT_SIZE = 24;
+  const AVALONIA_DEFAULT_STYLE: PreviewIconStyle = 'Regular';
 
   let copiedKey = $state('');
   let copiedKeyPulse = $state(0);
@@ -40,7 +50,62 @@
   let copiedSvg = $state(false);
   let copiedSvgPulse = $state(0);
   let copiedSvgTimeout: ReturnType<typeof window.setTimeout> | undefined;
+  let copiedSnippet = $state<SnippetId | ''>('');
+  let copiedSnippetPulse = $state(0);
+  let copiedSnippetTimeout: ReturnType<typeof window.setTimeout> | undefined;
   let sourcePreviewEl = $state<HTMLDivElement | null>(null);
+
+  let componentName = $derived(
+    selectedIcon ? `FluentIcon${selectedIcon.key.replace(/_/g, '')}` : '',
+  );
+  let avaloniaSymbol = $derived(
+    selectedIcon ? selectedIcon.key.replace(/_/g, '') : '',
+  );
+  let avaloniaSymbolKey = $derived(
+    avaloniaSymbol ? `FluentIconSymbol.${avaloniaSymbol}` : '',
+  );
+  let svelteImportSnippet = $derived(
+    selectedIcon
+      ? `import ${componentName} from '@oneo/fluentui-icons-like/${componentName}.svelte';`
+      : '',
+  );
+  let svelteIconSnippet = $derived(
+    selectedIcon ? buildSvelteIconSnippet() : '',
+  );
+  let avaloniaIconSnippet = $derived(
+    selectedIcon ? buildAvaloniaIconSnippet() : '',
+  );
+
+  function buildSvelteIconSnippet() {
+    const attrs: string[] = [];
+    if (selectedSize !== SVELTE_DEFAULT_SIZE)
+      attrs.push(`size={${selectedSize}}`);
+    if (selectedStyle !== SVELTE_DEFAULT_STYLE)
+      attrs.push(`style='${selectedStyle}'`);
+    const suffix = attrs.length ? ` ${attrs.join(' ')}` : '';
+    return `<${componentName}${suffix} />`;
+  }
+
+  function buildAvaloniaIconSnippet() {
+    const attrs = [`Symbol="${avaloniaSymbol}"`];
+    if (selectedSize !== AVALONIA_DEFAULT_SIZE)
+      attrs.push(`Size="Size${selectedSize}"`);
+    if (selectedStyle !== AVALONIA_DEFAULT_STYLE)
+      attrs.push(`Style="${selectedStyle}"`);
+    return `<icons:FluentIcon ${attrs.join(' ')} />`;
+  }
+
+  function copySnippet(id: SnippetId, snippet: string) {
+    if (!snippet) return;
+
+    copiedSnippet = id;
+    copiedSnippetPulse += 1;
+    window.clearTimeout(copiedSnippetTimeout);
+    copiedSnippetTimeout = window.setTimeout(() => {
+      if (copiedSnippet === id) copiedSnippet = '';
+    }, 420);
+    void navigator.clipboard.writeText(snippet).catch(() => undefined);
+  }
 
   function splitKeywords(keyword: string) {
     return keyword
@@ -168,7 +233,8 @@
           <div
             class="grid overflow-hidden border-b border-border shadow-inner"
             style="color: {selectedColor}">
-            <div class="preview-grid grid aspect-square w-full place-items-center bg-background">
+            <div
+              class="preview-grid grid aspect-square w-full place-items-center bg-background">
               <LazyIcon
                 icon={selectedIcon}
                 size={120}
@@ -182,7 +248,10 @@
                 aria-label="Download SVG"
                 title="Download SVG"
                 onclick={downloadSvg}>
-                <ArrowDownloadIcon size={16} style={selectedStyle} title={null} />
+                <ArrowDownloadIcon
+                  size={16}
+                  style={selectedStyle}
+                  title={null} />
                 <span>SVG</span>
               </button>
               <button
@@ -225,25 +294,6 @@
         </dd>
       </div>
       <div class={`${detailRow} px-2`}>
-        <dt class={detailLabel}>Key</dt>
-        <dd
-          class="m-0 flex min-w-0 items-center justify-between gap-2 text-xs leading-7 text-card-foreground">
-          <span class="min-w-0 [overflow-wrap:anywhere]"
-            >{selectedIcon.key}</span
-          >
-          <button
-            type="button"
-            class={copyButtonClass}
-            data-copied={copiedKey === selectedIcon.key}
-            data-copy-pulse={copiedKeyPulse % 2 === 0 ? "even" : "odd"}
-            aria-label="Copy key"
-            title={copiedKey === selectedIcon.key ? "Copied" : "Copy key"}
-            onclick={() => copyKey(selectedIcon.key)}>
-            <CopyIcon size={16} style={selectedStyle} title={null} />
-          </button>
-        </dd>
-      </div>
-      <div class={`${detailRow} px-2`}>
         <dt class={detailLabel}>Name</dt>
         <dd
           class="m-0 flex min-w-0 items-center justify-between gap-2 text-xs leading-7 text-card-foreground">
@@ -258,6 +308,82 @@
             aria-label="Copy name"
             title={copiedName === selectedIcon.name ? "Copied" : "Copy name"}
             onclick={() => copyName(selectedIcon.name)}>
+            <CopyIcon size={16} style={selectedStyle} title={null} />
+          </button>
+        </dd>
+      </div>
+      <div class={`${detailRow} px-2`}>
+        <dt class={detailLabel}>Svelte import</dt>
+        <dd
+          class="m-0 flex min-w-0 items-start justify-between gap-2 text-card-foreground">
+          <code class={snippetCodeClass}>{svelteImportSnippet}</code>
+          <button
+            type="button"
+            class={snippetButtonClass}
+            data-copied={copiedSnippet === "svelte-import"}
+            data-copy-pulse={copiedSnippetPulse % 2 === 0 ? "even" : "odd"}
+            aria-label="Copy Svelte import"
+            title={copiedSnippet === "svelte-import"
+              ? "Copied"
+              : "Copy Svelte import"}
+            onclick={() => copySnippet("svelte-import", svelteImportSnippet)}>
+            <CopyIcon size={16} style={selectedStyle} title={null} />
+          </button>
+        </dd>
+      </div>
+      <div class={`${detailRow} px-2`}>
+        <dt class={detailLabel}>Svelte</dt>
+        <dd
+          class="m-0 flex min-w-0 items-start justify-between gap-2 text-card-foreground">
+          <code class={snippetCodeClass}>{svelteIconSnippet}</code>
+          <button
+            type="button"
+            class={snippetButtonClass}
+            data-copied={copiedSnippet === "svelte"}
+            data-copy-pulse={copiedSnippetPulse % 2 === 0 ? "even" : "odd"}
+            aria-label="Copy Svelte component"
+            title={copiedSnippet === "svelte"
+              ? "Copied"
+              : "Copy Svelte component"}
+            onclick={() => copySnippet("svelte", svelteIconSnippet)}>
+            <CopyIcon size={16} style={selectedStyle} title={null} />
+          </button>
+        </dd>
+      </div>
+      <div class={`${detailRow} px-2`}>
+        <dt class={detailLabel}>Avalonia key</dt>
+        <dd
+          class="m-0 flex min-w-0 items-start justify-between gap-2 text-card-foreground">
+          <code class={snippetCodeClass}>{avaloniaSymbolKey}</code>
+          <button
+            type="button"
+            class={snippetButtonClass}
+            data-copied={copiedKey === avaloniaSymbolKey}
+            data-copy-pulse={copiedKeyPulse % 2 === 0 ? "even" : "odd"}
+            aria-label="Copy Avalonia key"
+            title={copiedKey === avaloniaSymbolKey
+              ? "Copied"
+              : "Copy Avalonia key"}
+            onclick={() => copyKey(avaloniaSymbolKey)}>
+            <CopyIcon size={16} style={selectedStyle} title={null} />
+          </button>
+        </dd>
+      </div>
+      <div class={`${detailRow} px-2`}>
+        <dt class={detailLabel}>Avalonia</dt>
+        <dd
+          class="m-0 flex min-w-0 items-start justify-between gap-2 text-card-foreground">
+          <code class={snippetCodeClass}>{avaloniaIconSnippet}</code>
+          <button
+            type="button"
+            class={snippetButtonClass}
+            data-copied={copiedSnippet === "avalonia"}
+            data-copy-pulse={copiedSnippetPulse % 2 === 0 ? "even" : "odd"}
+            aria-label="Copy Avalonia XAML"
+            title={copiedSnippet === "avalonia"
+              ? "Copied"
+              : "Copy Avalonia XAML"}
+            onclick={() => copySnippet("avalonia", avaloniaIconSnippet)}>
             <CopyIcon size={16} style={selectedStyle} title={null} />
           </button>
         </dd>
@@ -304,9 +430,7 @@
   {:else}
     <div
       class="grid min-h-[220px] place-items-center content-center gap-2 text-center text-muted-foreground">
-      <strong class="font-serif text-xl text-foreground"
-        >Select an icon</strong
-      >
+      <strong class="font-serif text-xl text-foreground">Select an icon</strong>
       <span>Details appear here.</span>
     </div>
   {/if}
@@ -329,7 +453,11 @@
   }
 
   .copy-button[data-copied='true'] {
-    background-color: color-mix(in oklab, var(--color-primary) 12%, var(--color-card));
+    background-color: color-mix(
+      in oklab,
+      var(--color-primary) 12%,
+      var(--color-card)
+    );
     color: var(--color-primary);
   }
 
@@ -420,7 +548,11 @@
     }
 
     .copy-button[data-copied='true'] {
-      background-color: color-mix(in oklab, var(--color-primary) 18%, var(--color-card));
+      background-color: color-mix(
+        in oklab,
+        var(--color-primary) 18%,
+        var(--color-card)
+      );
       color: var(--color-primary);
     }
   }

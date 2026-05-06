@@ -20,10 +20,10 @@ const PREVIEW_REGISTRY_PATH = resolve(
   'registry.ts',
 );
 
-const COMPONENT_PREFIX = 'FluentIcon_';
+const COMPONENT_PREFIX = 'FluentIcon';
 
 function getComponentName(icon: IconDefinition): string {
-  return `${COMPONENT_PREFIX}${icon.key}`;
+  return `${COMPONENT_PREFIX}${icon.key.replace(/_/g, '')}`;
 }
 
 export const svelteGenerator: Generator = {
