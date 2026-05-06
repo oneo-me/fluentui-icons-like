@@ -226,7 +226,8 @@
   }
 
   onMount(async () => {
-    const { registry } = await import('$lib/preview/registry.js');
+    const { loadRegistry } = await import('$lib/preview/registry.js');
+    const registry = await loadRegistry();
     source = registry;
 
     syncThemeIconColor();

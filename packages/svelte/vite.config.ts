@@ -1,27 +1,30 @@
-import { normalizePath } from 'vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'vite';
+import { defineConfig, normalizePath } from 'vite';
+
+const ICON_MARKER = '/src/lib/icons/';
+const ICON_FILE_PATTERN = /^FluentIcon([A-Za-z])([A-Za-z]?)/;
+
+function resolveIconChunkName(id: string): string | null {
+  const normalized = normalizePath(id);
+  const markerIndex = normalized.indexOf(ICON_MARKER);
+  if (markerIndex === -1) return null;
+
+  const filename = normalized.slice(markerIndex + ICON_MARKER.length);
+  const match = filename.match(ICON_FILE_PATTERN);
+  if (!match) return null;
+
+  const first = match[1].toLowerCase();
+  const second = (match[2] ?? '').toLowerCase();
+  return `icons-${first}${second || '_'}`;
+}
 
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit()],
   build: {
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          const normalized = normalizePath(id);
-          const marker = '/src/lib/icons/';
-          const markerIndex = normalized.indexOf(marker);
-
-          if (markerIndex === -1) return undefined;
-
-          const filename = normalized
-            .slice(markerIndex + marker.length)
-            .replace(/\.svelte.*$/, '');
-          const group = filename[0]?.toLowerCase();
-
-          return group ? `icons-${group}` : 'icons';
-        },
+        manualChunks: (id) => resolveIconChunkName(id) ?? undefined,
       },
     },
   },
