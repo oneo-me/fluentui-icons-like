@@ -2,8 +2,10 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { page } from '$app/stores';
-  import type { IconStyle } from '$lib/index.js';
-  import type { PreviewIconEntry } from '$lib/preview/registry.js';
+  import type {
+    PreviewIconEntry,
+    PreviewIconStyle,
+  } from '$lib/preview/registry.js';
   import FilterSidebar from '$lib/preview/FilterSidebar.svelte';
   import IconCatalog from '$lib/preview/IconCatalog.svelte';
   import IconDetails from '$lib/preview/IconDetails.svelte';
@@ -15,14 +17,18 @@
   const DEFAULT_ICON_COLOR = '';
   const THEME_ICON_COLOR = 'var(--color-foreground)';
 
-  const VALID_STYLES = new Set<IconStyle>(['Filled', 'Light', 'Regular']);
+  const VALID_STYLES = new Set<PreviewIconStyle>([
+    'Filled',
+    'Light',
+    'Regular',
+  ]);
   const VALID_SCALES = new Set([1, 2, 3]);
   const HEX_COLOR_RE = /^#[0-9a-f]{6}$/i;
 
   function readParams(url: URL): {
     keyword: string;
     size: number;
-    style: IconStyle;
+    style: PreviewIconStyle;
     metaphor: string;
     iconKey: string;
     color: string;
@@ -35,8 +41,8 @@
     return {
       keyword: p.get('q') ?? '',
       size: Number(p.get('size')) || 20,
-      style: VALID_STYLES.has(style as IconStyle)
-        ? (style as IconStyle)
+      style: VALID_STYLES.has(style as PreviewIconStyle)
+        ? (style as PreviewIconStyle)
         : 'Regular',
       metaphor: p.get('metaphor') ?? '',
       iconKey: p.get('icon') ?? '',
@@ -62,7 +68,7 @@
   let source = $state<PreviewIconEntry[]>([]);
   let keyword = $state('');
   let selectedSize = $state(20);
-  let selectedStyle = $state<IconStyle>('Regular');
+  let selectedStyle = $state<PreviewIconStyle>('Regular');
   let selectedMetaphor = $state('');
   let selectedColor = $state(DEFAULT_ICON_COLOR);
   let themeIconColor = $state('#333333');
@@ -183,7 +189,7 @@
     resetScroll();
   }
 
-  function selectStyle(style: IconStyle) {
+  function selectStyle(style: PreviewIconStyle) {
     selectedStyle = style;
     resetScroll();
   }

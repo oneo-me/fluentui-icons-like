@@ -62,13 +62,18 @@
     "access": "public"
   },
   "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "import": "./dist/index.js"
+    },
     "./*.svelte": {
-      "types": "./*.svelte.d.ts",
-      "svelte": "./*.svelte"
+      "types": "./dist/*.svelte.d.ts",
+      "svelte": "./dist/*.svelte"
     }
   },
   "files": [
-    "../../README.md",
+    "README.md",
     "logo.png",
     "dist/**"
   ],

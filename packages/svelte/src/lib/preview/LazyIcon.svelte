@@ -1,6 +1,5 @@
 <script lang="ts">
-  import type { IconStyle } from '$lib/index.js';
-  import type { PreviewIconEntry } from './registry.js';
+  import type { PreviewIconEntry, PreviewIconStyle } from './registry.js';
 
   let {
     icon,
@@ -10,7 +9,7 @@
   }: {
     icon: PreviewIconEntry;
     size: number;
-    style: IconStyle;
+    style: PreviewIconStyle;
     title?: string | null;
   } = $props();
 

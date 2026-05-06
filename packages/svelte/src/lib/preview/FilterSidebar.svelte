@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { IconStyle } from '$lib/index.js';
+  import type { PreviewIconStyle } from './registry.js';
 
   let {
     iconCount,
@@ -16,14 +16,14 @@
   }: {
     iconCount: number;
     allSizes: number[];
-    allStyles: IconStyle[];
+    allStyles: PreviewIconStyle[];
     visibleMetaphors: string[];
     selectedSize: number;
-    selectedStyle: IconStyle;
+    selectedStyle: PreviewIconStyle;
     selectedMetaphor: string;
     metaphorKeyword: string;
     onSelectSize: (size: number) => void;
-    onSelectStyle: (style: IconStyle) => void;
+    onSelectStyle: (style: PreviewIconStyle) => void;
     onSelectMetaphor: (metaphor: string) => void;
   } = $props();
 

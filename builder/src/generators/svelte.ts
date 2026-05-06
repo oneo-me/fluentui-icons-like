@@ -11,7 +11,14 @@ import type { Generator } from './types.js';
 
 const PACKAGE_DIR = resolve(ROOT_DIR, 'packages', 'svelte');
 const ICONS_DIR = resolve(PACKAGE_DIR, 'src', 'lib', 'icons');
-const INDEX_PATH = resolve(PACKAGE_DIR, 'src', 'lib', 'index.ts');
+const INDEX_PATH = resolve(ICONS_DIR, 'index.ts');
+const PREVIEW_REGISTRY_PATH = resolve(
+  PACKAGE_DIR,
+  'src',
+  'lib',
+  'preview',
+  'registry.ts',
+);
 
 export const svelteGenerator: Generator = {
   name: 'svelte',
@@ -24,6 +31,10 @@ export const svelteGenerator: Generator = {
     files.push({
       path: INDEX_PATH,
       content: generateIndex(icons),
+    });
+    files.push({
+      path: PREVIEW_REGISTRY_PATH,
+      content: generatePreviewRegistry(icons),
     });
 
     return files;
@@ -127,41 +138,15 @@ function generateIndex(icons: IconDefinition[]): string {
     new Set(icons.flatMap((icon) => icon.styles)),
   ).sort((a, b) => a.localeCompare(b));
 
-  const imports = sortedFilenames
-    .map((filename) => `import ${filename} from './icons/${filename}.svelte';`)
-    .join('\n');
-
   const exports = sortedFilenames
     .map(
       (filename) =>
-        `export { default as ${filename} } from './icons/${filename}.svelte';`,
+        `export { default as ${filename} } from './${filename}.svelte';`,
     )
-    .join('\n');
-
-  const entries = sortedFilenames
-    .map((filename) => {
-      const icon = icons.find((item) => item.key === filename);
-      if (!icon) return '';
-      const metadata = {
-        key: icon.key,
-        name: icon.name,
-        sizes: icon.sizes,
-        styles: icon.styles,
-        keyword: icon.keyword,
-        description: icon.description,
-        metaphor: icon.metaphor,
-        directionType: icon.directionType,
-        singleton: icon.singleton,
-      };
-      return `  { ...${JSON.stringify(metadata)}, value: ${filename} },`;
-    })
-    .filter(Boolean)
     .join('\n');
 
   return `import type { Component } from 'svelte';
 import type { SVGAttributes } from 'svelte/elements';
-
-${imports}
 
 ${exports}
 
@@ -174,21 +159,59 @@ export type IconProps = Omit<SVGAttributes<SVGSVGElement>, 'style' | 'title'> & 
 };
 
 export type IconComponent = Component<IconProps>;
+`;
+}
 
-export interface IconEntry {
+function generatePreviewRegistry(icons: IconDefinition[]): string {
+  const sortedIcons = [...icons].sort((a, b) => naturalCompare(a.key, b.key));
+  const iconStyles = Array.from(
+    new Set(sortedIcons.flatMap((icon) => icon.styles)),
+  ).sort((a, b) => a.localeCompare(b));
+  const entries = sortedIcons
+    .map((icon) => {
+      const metadata = {
+        key: icon.key,
+        name: icon.name,
+        sizes: icon.sizes,
+        styles: icon.styles,
+        keyword: icon.keyword,
+        description: icon.description,
+        metaphor: icon.metaphor,
+        directionType: icon.directionType,
+        singleton: icon.singleton,
+      };
+
+      return `  { ...${JSON.stringify(metadata)}, load: () => import('../icons/${icon.key}.svelte') },`;
+    })
+    .join('\n');
+
+  return `import type { Component } from 'svelte';
+import type { SVGAttributes } from 'svelte/elements';
+
+export type PreviewIconStyle = ${toTypeUnion(iconStyles)};
+
+export type PreviewIconProps = Omit<SVGAttributes<SVGSVGElement>, 'style' | 'title'> & {
+  size?: number;
+  style?: PreviewIconStyle;
+  title?: string | null;
+};
+
+export type PreviewIconModule = { default: Component<PreviewIconProps> };
+
+export interface PreviewIconEntry {
   key: string;
   name: string;
-  value: IconComponent;
   sizes: number[];
-  styles: IconStyle[];
+  styles: PreviewIconStyle[];
   keyword: string;
   description: string;
   metaphor: string[];
   directionType: string | null;
   singleton: string | null;
+  load: () => Promise<PreviewIconModule>;
 }
 
-export const registry: IconEntry[] = [
+export const registry: PreviewIconEntry[] = [
 ${entries}
 ];
 `;

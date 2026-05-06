@@ -2,6 +2,10 @@
 
 `fluentui-icons-like` is a small monorepo for shipping Microsoft Fluent UI System Icons in practical app-friendly forms.
 
+## Screenshot
+
+![FluentUI Icons Like screenshot](./screenshot.png)
+
 ## Packages
 
 | Package | Ecosystem | Status |
@@ -54,9 +58,20 @@ Reference the source generator as an analyzer in your project file:
 
 ```xml
 <ItemGroup>
-  <PackageReference Include="ONEO.FluentUIIconsLike" Version="2.0.0-beta.0" />
-  <PackageReference Include="ONEO.FluentUIIconsLike.Generator" Version="2.0.0-beta.0" PrivateAssets="all" />
+  <PackageReference Include="ONEO.FluentUIIconsLike" Version="2.0.0-preview.0" />
+  <PackageReference Include="ONEO.FluentUIIconsLike.Generator" Version="2.0.0-preview.0" PrivateAssets="all" />
 </ItemGroup>
+```
+
+Add `FluentIconReferences` to list the icons your app uses. The source generator builds icon data from these references:
+
+```csharp
+using FluentUIIconsLike;
+
+[assembly: FluentIconReferences(
+    FluentIconSymbol.AccessTime,
+    FluentIconSymbol.Accessibility,
+    FluentIconSymbol.Add)]
 ```
 
 Use the icon control in `axaml`:

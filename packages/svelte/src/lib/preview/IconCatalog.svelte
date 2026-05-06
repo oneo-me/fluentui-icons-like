@@ -1,7 +1,6 @@
 <script lang="ts">
-  import type { IconStyle } from '$lib/index.js';
   import LazyIcon from './LazyIcon.svelte';
-  import type { PreviewIconEntry } from './registry.js';
+  import type { PreviewIconEntry, PreviewIconStyle } from './registry.js';
 
   let {
     keyword = $bindable(),
@@ -32,7 +31,7 @@
     visibleIcons: PreviewIconEntry[];
     selectedIcon: PreviewIconEntry | null;
     selectedSize: number;
-    selectedStyle: IconStyle;
+    selectedStyle: PreviewIconStyle;
     selectedColor: string;
     effectiveSelectedColor: string;
     colorPickerValue: string;

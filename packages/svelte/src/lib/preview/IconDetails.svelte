@@ -3,9 +3,8 @@
   import CodeIcon from '$lib/icons/Code.svelte';
   import CopyIcon from '$lib/icons/Copy.svelte';
   import ImageIcon from '$lib/icons/Image.svelte';
-  import type { IconStyle } from '$lib/index.js';
   import LazyIcon from './LazyIcon.svelte';
-  import type { PreviewIconEntry } from './registry.js';
+  import type { PreviewIconEntry, PreviewIconStyle } from './registry.js';
 
   let {
     selectedIcon,
@@ -15,7 +14,7 @@
   }: {
     selectedIcon: PreviewIconEntry | null;
     selectedSize: number;
-    selectedStyle: IconStyle;
+    selectedStyle: PreviewIconStyle;
     selectedColor: string;
   } = $props();
 

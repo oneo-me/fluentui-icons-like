@@ -16,6 +16,7 @@ const npmPackage = {
   name: '@oneo/fluentui-icons-like',
   directory: SVELTE_DIR,
   manifestPath: path.resolve(SVELTE_DIR, 'package.json'),
+  readmePath: path.resolve(SVELTE_DIR, 'README.md'),
 };
 
 const nugetPackages = [
@@ -98,23 +99,28 @@ function setNugetPackageVersions(version: string): void {
 
 function packNpmPackage(version: string): string {
   console.log(`  Packing ${npmPackage.name}...`);
-  const output = execFileSync('pnpm', ['pack'], {
-    cwd: npmPackage.directory,
-    encoding: 'utf8',
-    stdio: ['ignore', 'pipe', 'inherit'],
-  }).trim();
-  const archiveName = output.split(/\r?\n/).at(-1);
-  if (!archiveName) {
-    throw new Error(`Unable to determine packed archive for ${npmPackage.name}`);
-  }
+  fs.copyFileSync(path.resolve(ROOT_DIR, 'README.md'), npmPackage.readmePath);
+  try {
+    const output = execFileSync('pnpm', ['pack'], {
+      cwd: npmPackage.directory,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'inherit'],
+    }).trim();
+    const archiveName = output.split(/\r?\n/).at(-1);
+    if (!archiveName) {
+      throw new Error(`Unable to determine packed archive for ${npmPackage.name}`);
+    }
 
-  const archivePath = path.resolve(npmPackage.directory, archiveName);
-  if (!fs.existsSync(archivePath)) {
-    throw new Error(`Packed archive not found: ${archivePath}`);
-  }
+    const archivePath = path.resolve(npmPackage.directory, archiveName);
+    if (!fs.existsSync(archivePath)) {
+      throw new Error(`Packed archive not found: ${archivePath}`);
+    }
 
-  console.log(`  Packed ${npmPackage.name} ${version}`);
-  return archivePath;
+    console.log(`  Packed ${npmPackage.name} ${version}`);
+    return archivePath;
+  } finally {
+    fs.rmSync(npmPackage.readmePath, { force: true });
+  }
 }
 
 function packNugetPackage(projectPath: string, packageId: string): string {
