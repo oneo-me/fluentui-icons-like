@@ -2,8 +2,8 @@
 .DS_Store
 publish
 
-#AI
-.agents
+# AI
 .codex
 .cursor
+.opencode
 AGENTS.md
