@@ -7,6 +7,10 @@ const PUBLISH_DIR = path.resolve(ROOT_DIR, 'publish');
 const SVELTE_DIR = path.resolve(ROOT_DIR, 'packages', 'svelte');
 const AVALONIA_DIR = path.resolve(ROOT_DIR, 'packages', 'avalonia');
 const AVALONIA_VERSION_PROPS = path.resolve(AVALONIA_DIR, 'Directory.Build.props');
+const ROOT_README_PATH = path.resolve(ROOT_DIR, 'README.md');
+const ROOT_LOGO_PATH = path.resolve(ROOT_DIR, 'logo.png');
+const ROOT_SCREENSHOT_PATH = path.resolve(ROOT_DIR, 'screenshot.png');
+const SVELTE_STATIC_LOGO_PATH = path.resolve(SVELTE_DIR, 'static', 'logo.png');
 const SVELTE_BUILD_DIRS = [
   path.resolve(SVELTE_DIR, 'dist'),
   path.resolve(SVELTE_DIR, '.svelte-kit'),
@@ -17,6 +21,8 @@ const npmPackage = {
   directory: SVELTE_DIR,
   manifestPath: path.resolve(SVELTE_DIR, 'package.json'),
   readmePath: path.resolve(SVELTE_DIR, 'README.md'),
+  logoPath: path.resolve(SVELTE_DIR, 'logo.png'),
+  screenshotPath: path.resolve(SVELTE_DIR, 'screenshot.png'),
 };
 
 const nugetPackages = [
@@ -99,28 +105,66 @@ function setNugetPackageVersions(version: string): void {
 
 function packNpmPackage(version: string): string {
   console.log(`  Packing ${npmPackage.name}...`);
-  fs.copyFileSync(path.resolve(ROOT_DIR, 'README.md'), npmPackage.readmePath);
+  installNpmPackageDependencies();
+  syncSvelteStaticAssets();
+  copyNpmPackageMetadata();
+  removeNpmArchives();
   try {
-    const output = execFileSync('pnpm', ['pack'], {
+    execFileSync('pnpm', ['pack'], {
       cwd: npmPackage.directory,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'inherit'],
-    }).trim();
-    const archiveName = output.split(/\r?\n/).at(-1);
-    if (!archiveName) {
-      throw new Error(`Unable to determine packed archive for ${npmPackage.name}`);
-    }
+    });
 
-    const archivePath = path.resolve(npmPackage.directory, archiveName);
-    if (!fs.existsSync(archivePath)) {
-      throw new Error(`Packed archive not found: ${archivePath}`);
-    }
+    const archivePath = findNpmArchive();
 
     console.log(`  Packed ${npmPackage.name} ${version}`);
     return archivePath;
   } finally {
     fs.rmSync(npmPackage.readmePath, { force: true });
+    fs.rmSync(npmPackage.logoPath, { force: true });
+    fs.rmSync(npmPackage.screenshotPath, { force: true });
   }
+}
+
+function installNpmPackageDependencies(): void {
+  execFileSync('pnpm', ['install', '--frozen-lockfile', '--ignore-scripts'], {
+    cwd: npmPackage.directory,
+    stdio: 'inherit',
+  });
+}
+
+function syncSvelteStaticAssets(): void {
+  fs.mkdirSync(path.dirname(SVELTE_STATIC_LOGO_PATH), { recursive: true });
+  fs.copyFileSync(ROOT_LOGO_PATH, SVELTE_STATIC_LOGO_PATH);
+}
+
+function copyNpmPackageMetadata(): void {
+  fs.copyFileSync(ROOT_README_PATH, npmPackage.readmePath);
+  fs.copyFileSync(ROOT_LOGO_PATH, npmPackage.logoPath);
+  fs.copyFileSync(ROOT_SCREENSHOT_PATH, npmPackage.screenshotPath);
+}
+
+function removeNpmArchives(): void {
+  for (const entry of fs.readdirSync(npmPackage.directory)) {
+    if (entry.endsWith('.tgz')) {
+      fs.rmSync(path.resolve(npmPackage.directory, entry), { force: true });
+    }
+  }
+}
+
+function findNpmArchive(): string {
+  const archives = fs
+    .readdirSync(npmPackage.directory)
+    .filter((entry) => entry.endsWith('.tgz'));
+
+  if (archives.length !== 1) {
+    throw new Error(
+      `Expected one packed archive for ${npmPackage.name}, found ${archives.length}`,
+    );
+  }
+
+  return path.resolve(npmPackage.directory, archives[0]);
 }
 
 function packNugetPackage(projectPath: string, packageId: string): string {
