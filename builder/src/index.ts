@@ -3,6 +3,7 @@
 import { generate } from './generate.js';
 import { avaloniaGenerator } from './generators/avalonia.js';
 import { svelteGenerator } from './generators/svelte.js';
+import { wpfGenerator } from './generators/wpf.js';
 import { pack } from './pack.js';
 import { scanIcons } from './scan.js';
 import { syncSource } from './sync.js';
@@ -20,6 +21,9 @@ function main() {
       switch (generatorName) {
         case 'avalonia':
           generate(avaloniaGenerator, icons);
+          break;
+        case 'wpf':
+          generate(wpfGenerator, icons);
           break;
         case 'svelte':
           generate(svelteGenerator, icons);
