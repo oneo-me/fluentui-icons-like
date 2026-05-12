@@ -12,7 +12,8 @@
     "apps/preview/src/components/ui/**",
     "packages/avalonia/**",
     "packages/react/src/icons/**",
-    "packages/svelte/src/lib/icons/**"
+    "packages/svelte/src/lib/icons/**",
+    "packages/wpf/**"
   ],
   "rules": {
     "react/set-state-in-effect": "off",

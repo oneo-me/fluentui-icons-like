@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <IsPackable>false</IsPackable>
+        <OutputType>WinExe</OutputType>
+        <UseWPF>true</UseWPF>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+        <StartupObject>FluentUIIconsLikeDemo.App</StartupObject>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\FluentUIIconsLike\FluentUIIconsLike.csproj" />
+        <ProjectReference Include="..\FluentUIIconsLike.Generator\FluentUIIconsLike.Generator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="all" />
+    </ItemGroup>
+</Project>

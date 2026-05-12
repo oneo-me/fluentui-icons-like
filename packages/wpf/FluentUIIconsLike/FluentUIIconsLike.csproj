@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <PackageId>ONEO.FluentUIIconsLike.Wpf</PackageId>
+        <Description>Microsoft Fluent UI System Icons as WPF controls. Lightweight icon rendering for WPF applications.</Description>
+        <PackageTags>wpf;fluentui;fluent-ui;fluent;icons;icon;svg;microsoft;system-icons</PackageTags>
+    </PropertyGroup>
+    <ItemGroup>
+        <None Include="../../../README.md" Pack="true" PackagePath="README.md" />
+        <None Include="../../../screenshot.png" Pack="true" PackagePath="screenshot.png" />
+        <None Include="../../../logo.png" Pack="true" PackagePath="logo.png" />
+    </ItemGroup>
+</Project>

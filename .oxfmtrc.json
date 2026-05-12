@@ -13,7 +13,8 @@
     "packages/avalonia/**",
     "packages/react/src/icons/**",
     "packages/svelte/src/lib/icons/**",
-    "apps/preview/src/preview/icons.json"
+    "apps/preview/src/preview/icons.json",
+    "packages/wpf/**"
   ],
   "sortImports": {
     "newlinesBetween": false

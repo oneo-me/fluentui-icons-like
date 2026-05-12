@@ -33,3 +33,9 @@ publish
 
 # typescript
 *.tsbuildinfo
+
+# AI
+.orivis
+.codex
+.cursor
+.opencode

@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <DevelopmentDependency>true</DevelopmentDependency>
+        <BuildOutputTargetFolder>analyzers/dotnet/cs</BuildOutputTargetFolder>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+        <NoWarn>NU5128;RS2008</NoWarn>
+        <Nullable>enable</Nullable>
+        <LangVersion>latest</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <IsAotCompatible>false</IsAotCompatible>
+        <PackageId>ONEO.FluentUIIconsLike.Wpf.Generator</PackageId>
+        <Description>Source generator for ONEO FluentUI Icons Like on WPF. Generates icon data for referenced symbols.</Description>
+        <PackageTags>wpf;fluentui;fluent-ui;fluent;icons;icon;source-generator;roslyn;microsoft;system-icons</PackageTags>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="5.3.0" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0" PrivateAssets="all" />
+        <PackageReference Include="System.Text.Json" Version="10.0.7" PrivateAssets="all" />
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="Assets\fluent-icons.json" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Include="../../../README.md" Pack="true" PackagePath="README.md" />
+        <None Include="../../../screenshot.png" Pack="true" PackagePath="screenshot.png" />
+        <None Include="../../../logo.png" Pack="true" PackagePath="logo.png" />
+    </ItemGroup>
+</Project>

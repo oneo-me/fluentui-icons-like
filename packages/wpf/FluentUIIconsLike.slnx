@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/_/">
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+  </Folder>
+  <Project Path="FluentUIIconsLike.Generator\FluentUIIconsLike.Generator.csproj" />
+  <Project Path="FluentUIIconsLikeDemo\FluentUIIconsLikeDemo.csproj" />
+  <Project Path="FluentUIIconsLike\FluentUIIconsLike.csproj" />
+</Solution>

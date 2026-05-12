@@ -215,6 +215,10 @@ The preview is built as a validation step; Cloudflare deployment remains indepen
 
 [GitHub scheduled workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) can be delayed and are disabled in public repositories after 60 days without repository activity. This automation therefore depends on the schedule remaining enabled; it is not an exact-time timer. Run `bun run test` to check interval, version selection, metadata validation, draft recovery, registry failures, and publication requests against mocked services without publishing.
 
+### WPF Branch
+
+The `feat/wpf` branch includes the WPF runtime, source generator, and demo under `packages/wpf`. Generate its icon data with `bun run gen -- wpf`. The default generation, packing, and automatic release workflow still target Svelte, React, and Avalonia; WPF is not included in automatic publication. Building and running the WPF demo requires Windows.
+
 ## License
 
 MIT

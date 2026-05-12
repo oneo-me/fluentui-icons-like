@@ -4,6 +4,7 @@ import { generate } from './generate.js';
 import { avaloniaGenerator } from './generators/avalonia.js';
 import { reactGenerator } from './generators/react.js';
 import { svelteGenerator } from './generators/svelte.js';
+import { wpfGenerator } from './generators/wpf.js';
 import { pack } from './pack.js';
 import { scanIcons } from './scan.js';
 import { syncSource } from './sync.js';
@@ -36,6 +37,9 @@ function main() {
         case 'react':
           generate(reactGenerator, icons);
           break;
+        case 'wpf':
+          generate(wpfGenerator, icons);
+          break;
         case 'svelte':
           generate(svelteGenerator, icons);
           break;
@@ -55,7 +59,7 @@ function main() {
     }
     default:
       console.error(
-        'Usage: builder <sync|generate [all|svelte|react|avalonia]|pack>',
+        'Usage: builder <sync|generate [all|svelte|react|avalonia|wpf]|pack>',
       );
       process.exit(1);
   }
