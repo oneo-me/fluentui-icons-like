@@ -1,0 +1,20 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "label": "dev",
+      "script": "dev"
+    },
+    {
+      "type": "npm",
+      "label": "build",
+      "script": "build"
+    },
+    {
+      "type": "npm",
+      "label": "check",
+      "script": "check"
+    }
+  ]
+}

@@ -11,6 +11,7 @@ const AVALONIA_VERSION_PROPS = path.resolve(
   AVALONIA_DIR,
   'Directory.Build.props',
 );
+const ROOT_PACKAGE_MANIFEST_PATH = path.resolve(ROOT_DIR, 'package.json');
 const ROOT_README_PATH = path.resolve(ROOT_DIR, 'README.md');
 const ROOT_LOGO_PATH = path.resolve(ROOT_DIR, 'logo.png');
 const ROOT_SCREENSHOT_PATH = path.resolve(ROOT_DIR, 'screenshot.png');
@@ -70,7 +71,8 @@ const nugetPackages = [
   },
 ];
 
-export function pack(version: string): void {
+export function pack(): void {
+  const version = readRootPackageVersion();
   console.log(`Packing all packages with version ${version}...`);
 
   cleanPackArtifacts();
@@ -94,6 +96,18 @@ export function pack(version: string): void {
   }
 
   console.log(`Artifacts written to ${path.relative(ROOT_DIR, PUBLISH_DIR)}`);
+}
+
+function readRootPackageVersion(): string {
+  const manifest = JSON.parse(
+    fs.readFileSync(ROOT_PACKAGE_MANIFEST_PATH, 'utf8'),
+  ) as Record<string, unknown>;
+
+  if (typeof manifest.version !== 'string' || manifest.version.length === 0) {
+    throw new Error(`Version not found in ${ROOT_PACKAGE_MANIFEST_PATH}`);
+  }
+
+  return manifest.version;
 }
 
 function cleanPackArtifacts(): void {

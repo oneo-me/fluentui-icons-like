@@ -1,6 +1,6 @@
 {
   "name": "@oneo/fluentui-icons-like-react",
-  "version": "2.0.1",
+  "version": "2.1.0-preview.0",
   "description": "Microsoft Fluent UI System Icons as tree-shakable React SVG components.",
   "author": "ONEO",
   "license": "MIT",

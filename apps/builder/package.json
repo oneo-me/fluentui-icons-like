@@ -7,14 +7,14 @@
     "builder": "./dist/index.js"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
     "check": "tsc --noEmit -p tsconfig.json",
-    "sync": "tsc && node dist/index.js sync",
-    "generate": "tsc && node dist/index.js generate",
-    "pack": "tsc && node dist/index.js pack"
+    "sync": "tsx src/index.ts sync",
+    "generate": "tsx src/index.ts generate",
+    "pack": "tsx src/index.ts pack"
   },
   "devDependencies": {
     "@types/node": "^25.9.1",
+    "tsx": "^4.22.4",
     "typescript": "^6.0.3"
   }
 }

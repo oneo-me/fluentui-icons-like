@@ -18,10 +18,15 @@ function main() {
     case 'generate': {
       const generatorName =
         process.argv[3] === '--'
-          ? process.argv[4] || 'svelte'
-          : process.argv[3] || 'svelte';
+          ? process.argv[4] || 'all'
+          : process.argv[3] || 'all';
       const icons = scanIcons();
       switch (generatorName) {
+        case 'all':
+          generate(svelteGenerator, icons);
+          generate(reactGenerator, icons);
+          generate(avaloniaGenerator, icons);
+          break;
         case 'avalonia':
           generate(avaloniaGenerator, icons);
           break;
@@ -38,17 +43,16 @@ function main() {
       break;
     }
     case 'pack': {
-      const version = process.argv[3];
-      if (!version) {
-        console.error('Usage: builder pack <version>');
+      if (process.argv[3]) {
+        console.error('Usage: builder pack');
         process.exit(1);
       }
-      pack(version);
+      pack();
       break;
     }
     default:
       console.error(
-        'Usage: builder <sync|generate [generator]|pack <version>>',
+        'Usage: builder <sync|generate [all|svelte|react|avalonia]|pack>',
       );
       process.exit(1);
   }

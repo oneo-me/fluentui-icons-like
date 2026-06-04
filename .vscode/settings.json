@@ -1,0 +1,9 @@
+{
+  "files.associations": {
+    "*.css": "tailwindcss"
+  },
+  "npm.scriptRunner": "pnpm",
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "file"
+}
