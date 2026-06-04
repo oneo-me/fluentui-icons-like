@@ -127,6 +127,7 @@ Use the icon control in `axaml`:
 
 - Node.js 22+
 - pnpm 11+
+- Wrangler 4
 - .NET SDK 10.0.0
 
 Install Node dependencies from the repository root:
@@ -142,7 +143,8 @@ The root workspace manages all Node packages. Use the root lockfile and avoid in
 ```text
 .
 ├── pnpm-workspace.yaml   # pnpm workspace packages and build approvals
-├── package.json          # root scripts for preview dev, checks, sync, generation, and packing
+├── package.json          # root scripts for preview dev, deployment, checks, sync, generation, and packing
+├── wrangler.jsonc        # Cloudflare Workers Assets config for preview deployment
 ├── biome.jsonc           # shared formatter and linter configuration
 ├── apps/
 │   ├── builder/          # icon build and generation scripts
@@ -161,6 +163,8 @@ The root scripts expose the main workspace tasks:
 
 ```bash
 pnpm run dev
+pnpm run build
+pnpm run deploy
 pnpm run check
 pnpm run sync
 pnpm run gen
@@ -169,6 +173,8 @@ pnpm run gen -- react
 pnpm run gen -- avalonia
 pnpm run pack
 ```
+
+`pnpm run deploy` builds the React preview app and deploys `apps/preview/dist` with Wrangler. The root `wrangler.jsonc` uses Workers Assets in static SPA mode, so unmatched navigation requests are served by `index.html`.
 
 `pnpm run gen` writes all generated package artifacts, including the preview icon metadata at `apps/preview/src/preview/icons.json`. Pass a generator name to limit output to one target.
 

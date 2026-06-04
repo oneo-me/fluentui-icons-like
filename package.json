@@ -7,13 +7,16 @@
   "type": "module",
   "scripts": {
     "dev": "pnpm --filter preview run dev",
+    "build": "pnpm --filter preview run build",
+    "deploy": "pnpm run build && wrangler deploy",
     "check": "biome check --write . && pnpm --filter builder run check && pnpm --filter @oneo/fluentui-icons-like run check && pnpm --filter @oneo/fluentui-icons-like-react run check && pnpm --filter preview run check",
     "sync": "pnpm --filter builder run sync",
     "gen": "pnpm --filter builder run generate",
     "pack": "pnpm --filter builder run pack"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.16"
+    "@biomejs/biome": "^2.4.16",
+    "wrangler": "^4.97.0"
   },
   "packageManager": "pnpm@11.5.1+sha512.93f7b57422ea7068257235b4c16eb60762eb68e1dc23723199cc739043ea9be2c4143274a399d8c6defa2b1176226d9ca1c4b63482d6200c1a8fbaa78c1d1485"
 }

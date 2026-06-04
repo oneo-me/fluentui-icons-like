@@ -1,0 +1,12 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "icon-oneo-me",
+  "compatibility_date": "2026-06-04",
+  "assets": {
+    "directory": "./apps/preview/dist",
+    "not_found_handling": "single-page-application"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
