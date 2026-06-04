@@ -1,4 +1,5 @@
 import { resolve } from 'node:path';
+import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig, normalizePath } from 'vite';
 
@@ -19,7 +20,7 @@ function resolveIconChunkName(id: string): string | null {
 }
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [tailwindcss(), react()],
   server: {
     fs: {
       allow: [rootDir],

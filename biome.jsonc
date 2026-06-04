@@ -14,6 +14,7 @@
       "!!**/.svelte-kit",
       "!!**/.wrangler",
       "!!pnpm-lock.yaml",
+      "!!apps/preview/src/components/ui",
       "!!packages/avalonia",
       "!!packages/react/src/icons",
       "!!packages/svelte/src/lib/icons",

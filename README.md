@@ -182,6 +182,12 @@ pnpm run pack
 
 The React generator also writes the preview metadata used by `apps/preview`.
 
+`apps/preview` uses shadcn/ui with Tailwind CSS 4. The app-local UI primitives live in `apps/preview/src/components/ui`, are configured by `apps/preview/components.json`, and are installed with the shadcn CLI, for example `pnpm dlx shadcn@latest add button`.
+
+`apps/preview/src/styles.css` is reserved for Tailwind/shadcn imports, design tokens, base rules, and shared keyframes. Component-specific layout, state, and responsive styling belong in the relevant React component as Tailwind classes.
+
+The preview icon catalog uses `@tanstack/react-virtual` for row virtualization. The catalog owns viewport measurement and derives tile size, columns, and row height from the selected icon size and display scale.
+
 ## License
 
 MIT

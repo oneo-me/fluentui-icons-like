@@ -1,12 +1,5 @@
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FilterSidebar } from './FilterSidebar';
 import { IconCatalog } from './IconCatalog';
 import { IconDetails } from './IconDetails';
@@ -15,13 +8,15 @@ import { loadRegistry } from './registry';
 import type { PreviewSearch } from './search';
 import { searchKey, toUrlSearch } from './search';
 
-const gap = 6;
-const padding = 10;
-const minOverscanRows = 8;
-const maxOverscanRows = 24;
 const defaultIconColor = '';
-const themeIconColor = 'var(--color-foreground)';
+const themeIconColor = 'var(--preview-foreground)';
 const validScales = new Set([1, 2, 3]);
+const appShellClassName =
+  'grid h-screen min-h-0 grid-cols-[236px_minmax(0,1fr)_282px] overflow-hidden bg-[var(--preview-background)] max-[980px]:grid-cols-[210px_minmax(0,1fr)] max-[760px]:grid-cols-1 max-[760px]:grid-rows-[auto_minmax(0,1fr)]';
+const loadingShellClassName =
+  'grid min-h-screen place-items-center content-center gap-3 text-[var(--preview-muted)]';
+const loadingMarkClassName =
+  'size-[38px] rounded-full border border-[var(--preview-border)] border-t-[var(--preview-primary)] motion-safe:animate-[spin_840ms_linear_infinite]';
 
 export function PreviewApp() {
   const routeSearch = useSearch({ from: '/' });
@@ -50,10 +45,7 @@ export function PreviewApp() {
   const [selectedScale, setSelectedScale] = useState(routeScale);
   const [themeColor, setThemeColor] = useState('oklch(0.332 0.018 255)');
   const [metaphorKeyword, setMetaphorKeyword] = useState('');
-  const [containerWidth, setContainerWidth] = useState(900);
-  const [containerHeight, setContainerHeight] = useState(620);
-  const [scrollRow, setScrollRow] = useState(0);
-  const gridRef = useRef<HTMLDivElement | null>(null);
+  const catalogScrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -98,7 +90,7 @@ export function PreviewApp() {
 
   const syncThemeColor = useCallback(() => {
     const color = getComputedStyle(document.documentElement)
-      .getPropertyValue('--color-foreground')
+      .getPropertyValue('--preview-foreground')
       .trim();
     if (color) setThemeColor(color);
   }, []);
@@ -173,36 +165,11 @@ export function PreviewApp() {
     [leftFiltered, keyword],
   );
 
-  const displaySize = selectedSize * selectedScale;
-  const baseItemSize = Math.max(36, displaySize + 24);
-  const columnsPerRow = Math.max(
-    1,
-    Math.floor((Math.max(0, containerWidth) + gap) / (baseItemSize + gap)),
-  );
-  const itemSize =
-    (Math.max(0, containerWidth) - gap * (columnsPerRow - 1)) / columnsPerRow;
-  const rowHeight = itemSize + gap;
-  const totalRows = Math.ceil(filtered.length / columnsPerRow);
-  const viewportRows = Math.ceil(containerHeight / rowHeight);
-  const overscanRows = Math.max(
-    minOverscanRows,
-    Math.min(maxOverscanRows, Math.ceil(viewportRows * 0.75)),
-  );
-  const startRow = Math.max(0, scrollRow - overscanRows);
-  const visibleRows = viewportRows + overscanRows * 2 + 1;
-  const startIndex = startRow * columnsPerRow;
-  const endIndex = Math.min(
-    filtered.length,
-    (startRow + visibleRows) * columnsPerRow,
-  );
-  const visibleIcons = filtered.slice(startIndex, endIndex);
-  const itemsTop = startRow * rowHeight;
   const effectiveSelectedColor = selectedColor || themeIconColor;
   const colorPickerValue = selectedColor || themeColor;
 
   const resetScroll = useCallback(() => {
-    setScrollRow(0);
-    if (gridRef.current) gridRef.current.scrollTop = 0;
+    if (catalogScrollRef.current) catalogScrollRef.current.scrollTop = 0;
   }, []);
 
   useEffect(() => {
@@ -246,38 +213,6 @@ export function PreviewApp() {
     }
   }, [filtered, selectedIcon]);
 
-  useLayoutEffect(() => {
-    if (loading) return;
-
-    const el = gridRef.current;
-    if (!el) return;
-
-    let frame = 0;
-    const measure = () => {
-      const { height, width } = measureGridContent(el);
-      setContainerWidth(width);
-      setContainerHeight(height);
-      setScrollRow(Math.floor(el.scrollTop / rowHeight));
-    };
-    const scheduleMeasure = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        measure();
-      });
-    };
-
-    measure();
-    const observer = new ResizeObserver(scheduleMeasure);
-    observer.observe(el);
-    window.addEventListener('resize', scheduleMeasure);
-    return () => {
-      if (frame) window.cancelAnimationFrame(frame);
-      observer.disconnect();
-      window.removeEventListener('resize', scheduleMeasure);
-    };
-  }, [loading, rowHeight]);
-
   const nextSearch = useMemo(
     () =>
       toUrlSearch({
@@ -310,24 +245,19 @@ export function PreviewApp() {
     });
   }, [loading, navigate, nextSearch, routeSearchKey]);
 
-  function onScroll() {
-    const el = gridRef.current;
-    if (!el) return;
-    const nextScrollRow = Math.floor(el.scrollTop / rowHeight);
-    if (nextScrollRow !== scrollRow) setScrollRow(nextScrollRow);
-  }
-
   if (loading) {
     return (
-      <div className="loading-shell">
-        <span className="loading-mark" />
-        <strong>Loading icon index</strong>
+      <div className={loadingShellClassName}>
+        <span className={loadingMarkClassName} />
+        <strong className="text-[13px] text-[var(--preview-foreground)]">
+          Loading icon index
+        </strong>
       </div>
     );
   }
 
   return (
-    <div className="app-shell">
+    <div className={appShellClassName}>
       <FilterSidebar
         iconCount={source.length}
         allSizes={allSizes}
@@ -356,7 +286,6 @@ export function PreviewApp() {
         keyword={keyword}
         leftFilteredCount={leftFiltered.length}
         filtered={filtered}
-        visibleIcons={visibleIcons}
         selectedIcon={selectedIcon}
         selectedSize={selectedSize}
         selectedStyle={selectedStyle}
@@ -364,19 +293,12 @@ export function PreviewApp() {
         effectiveSelectedColor={effectiveSelectedColor}
         colorPickerValue={colorPickerValue}
         selectedScale={selectedScale}
-        gridRef={gridRef}
-        totalRows={totalRows}
-        rowHeight={rowHeight}
-        padding={padding}
-        columnsPerRow={columnsPerRow}
-        itemsTop={itemsTop}
-        itemSize={itemSize}
+        scrollRef={catalogScrollRef}
         onKeywordChange={(value) => {
           setKeyword(value);
           resetScroll();
         }}
         onColorChange={setSelectedColor}
-        onScroll={onScroll}
         onSelectScale={(scale) => {
           if (!validScales.has(scale)) return;
           setSelectedScale(scale);
@@ -425,19 +347,4 @@ function matchesSearch(icon: PreviewIconEntry, keyword: string) {
 
 function getValidScale(scale: number | undefined) {
   return validScales.has(scale ?? 1) ? (scale ?? 1) : 1;
-}
-
-function measureGridContent(el: HTMLDivElement) {
-  const style = getComputedStyle(el);
-  const paddingX =
-    Number.parseFloat(style.paddingLeft) +
-    Number.parseFloat(style.paddingRight);
-  const paddingY =
-    Number.parseFloat(style.paddingTop) +
-    Number.parseFloat(style.paddingBottom);
-
-  return {
-    width: Math.max(0, el.clientWidth - paddingX),
-    height: Math.max(0, el.clientHeight - paddingY),
-  };
 }

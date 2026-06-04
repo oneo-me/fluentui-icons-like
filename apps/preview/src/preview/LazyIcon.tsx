@@ -28,7 +28,10 @@ export function LazyIcon({ icon, size, variant, title = null }: LazyIconProps) {
 
   if (!Component) {
     return (
-      <span className="icon-skeleton" style={{ width: size, height: size }} />
+      <span
+        className="block rounded-[5px] bg-[color-mix(in_oklab,var(--preview-muted)_16%,transparent)]"
+        style={{ width: size, height: size }}
+      />
     );
   }
 
