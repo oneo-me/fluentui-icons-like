@@ -126,16 +126,27 @@ Use the icon control in `axaml`:
 ### Environment
 
 - Node.js 22+
-- pnpm 10+
+- pnpm 11+
 - .NET SDK 10.0.0
+
+Install Node dependencies from the repository root:
+
+```bash
+pnpm install
+```
+
+The root workspace manages all Node packages. Use the root lockfile and avoid installing dependencies from individual package directories.
 
 ### Project Structure
 
 ```text
 .
+├── pnpm-workspace.yaml   # pnpm workspace packages and build approvals
+├── package.json          # root scripts for workspace checks and generation
+├── biome.jsonc           # shared formatter and linter configuration
 ├── apps/
+│   ├── builder/          # icon build and generation scripts
 │   └── preview/          # React + TanStack Router preview app
-├── builder/              # icon build and generation scripts
 ├── packages/
 │   ├── svelte/           # Svelte package
 │   ├── react/            # React package
@@ -149,13 +160,18 @@ Use the icon control in `axaml`:
 The builder generates framework-specific artifacts from `.cache/source/assets`:
 
 ```bash
-cd builder
-pnpm run generate -- svelte
-pnpm run generate -- react
-pnpm run generate -- avalonia
+pnpm run generate:svelte
+pnpm run generate:react
+pnpm run generate:avalonia
 ```
 
 The React generator also writes the preview metadata used by `apps/preview`.
+
+Run all Node package checks from the repository root:
+
+```bash
+pnpm run check
+```
 
 ## License
 

@@ -32,7 +32,7 @@
     "build": "svelte-package -i src/lib/icons",
     "prepack": "pnpm run build && publint",
     "svelte-check": "svelte-check --tsconfig ./tsconfig.json",
-    "check": "biome check --write && pnpm run svelte-check",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
     "pack": "pnpm pack",
     "publish": "pnpm publish"
   },
@@ -40,12 +40,11 @@
     "svelte": "^5.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.14",
-    "@sveltejs/package": "^2.5.7",
-    "@types/node": "^25.6.2",
-    "publint": "^0.3.20",
-    "svelte": "^5.55.5",
-    "svelte-check": "^4.4.8",
+    "@sveltejs/package": "^2.5.8",
+    "@types/node": "^25.9.1",
+    "publint": "^0.3.21",
+    "svelte": "^5.56.1",
+    "svelte-check": "^4.5.0",
     "typescript": "^6.0.3"
   },
   "publishConfig": {
@@ -64,6 +63,5 @@
     "logo.png",
     "dist/**"
   ],
-  "sideEffects": false,
-  "packageManager": "pnpm@11.0.9+sha512.34ce82e6780233cf9cad8685029a8f81d2e06196c5a9bad98879f7424940c6817c4e4524fb7d38b8553ceed48b9758b8ebaf1abd3600c232c4c8cf7366086f38"
+  "sideEffects": false
 }
