@@ -1,5 +1,12 @@
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { FilterSidebar } from './FilterSidebar';
 import { IconCatalog } from './IconCatalog';
 import { IconDetails } from './IconDetails';
@@ -239,19 +246,37 @@ export function PreviewApp() {
     }
   }, [filtered, selectedIcon]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
+    if (loading) return;
+
     const el = gridRef.current;
     if (!el) return;
 
-    const observer = new ResizeObserver(([entry]) => {
-      if (!entry) return;
-      setContainerWidth(entry.contentRect.width);
-      setContainerHeight(entry.contentRect.height);
+    let frame = 0;
+    const measure = () => {
+      const { height, width } = measureGridContent(el);
+      setContainerWidth(width);
+      setContainerHeight(height);
       setScrollRow(Math.floor(el.scrollTop / rowHeight));
-    });
+    };
+    const scheduleMeasure = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        measure();
+      });
+    };
+
+    measure();
+    const observer = new ResizeObserver(scheduleMeasure);
     observer.observe(el);
-    return () => observer.disconnect();
-  }, [rowHeight]);
+    window.addEventListener('resize', scheduleMeasure);
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener('resize', scheduleMeasure);
+    };
+  }, [loading, rowHeight]);
 
   const nextSearch = useMemo(
     () =>
@@ -400,4 +425,19 @@ function matchesSearch(icon: PreviewIconEntry, keyword: string) {
 
 function getValidScale(scale: number | undefined) {
   return validScales.has(scale ?? 1) ? (scale ?? 1) : 1;
+}
+
+function measureGridContent(el: HTMLDivElement) {
+  const style = getComputedStyle(el);
+  const paddingX =
+    Number.parseFloat(style.paddingLeft) +
+    Number.parseFloat(style.paddingRight);
+  const paddingY =
+    Number.parseFloat(style.paddingTop) +
+    Number.parseFloat(style.paddingBottom);
+
+  return {
+    width: Math.max(0, el.clientWidth - paddingX),
+    height: Math.max(0, el.clientHeight - paddingY),
+  };
 }

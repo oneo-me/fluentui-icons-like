@@ -1,11 +1,11 @@
 :root {
   color-scheme: light;
-  --color-background: oklch(0.985 0.004 255);
+  --color-background: oklch(1 0 0);
   --color-foreground: oklch(0.332 0.018 255);
-  --color-panel: oklch(0.969 0.006 255);
-  --color-panel-strong: oklch(0.993 0.002 255);
+  --color-panel: oklch(0.9846 0.0017 247.8389);
+  --color-panel-strong: oklch(1 0 0);
   --color-muted: oklch(0.642 0.025 255);
-  --color-border: oklch(0.895 0.01 255);
+  --color-border: oklch(0.9276 0.0058 264.5313);
   --color-border-strong: oklch(0.822 0.018 255);
   --color-primary: oklch(0.56 0.18 259);
   --color-primary-soft: oklch(0.936 0.033 255);
@@ -110,11 +110,16 @@ a {
   animation: spin 840ms linear infinite;
 }
 
-.filter-sidebar,
-.detail-panel {
+.filter-sidebar {
   min-width: 0;
   min-height: 0;
   background: var(--color-panel);
+}
+
+.detail-panel {
+  min-width: 0;
+  min-height: 0;
+  background: var(--color-background);
 }
 
 .filter-sidebar {
@@ -172,7 +177,7 @@ a {
   color: var(--color-foreground);
   font-size: 17px;
   line-height: 1.05;
-  font-weight: 760;
+  font-weight: 600;
 }
 
 .brand-copy span,
@@ -186,7 +191,7 @@ a {
   display: block;
   margin-top: 3px;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 560;
 }
 
 .primary-link {
@@ -334,6 +339,7 @@ a {
   min-width: 0;
   min-height: 0;
   flex-direction: column;
+  background: var(--color-background);
 }
 
 .catalog-toolbar {
@@ -343,11 +349,7 @@ a {
   align-items: center;
   gap: 10px;
   border-bottom: 1px solid var(--color-border);
-  background: color-mix(
-    in oklab,
-    var(--color-panel-strong) 82%,
-    var(--color-background)
-  );
+  background: var(--color-background);
   padding: 9px 10px;
 }
 
@@ -445,6 +447,7 @@ a {
   min-height: 0;
   flex: 1;
   overflow-y: auto;
+  background: var(--color-background);
   padding: 10px;
 }
 
@@ -470,11 +473,7 @@ a {
   place-items: center;
   overflow: hidden;
   border: 1px solid var(--color-border);
-  background: color-mix(
-    in oklab,
-    var(--color-panel-strong) 78%,
-    var(--color-background)
-  );
+  background: var(--color-background);
   box-shadow: 0 1px 2px var(--color-shadow);
   transition:
     transform 150ms ease-out,

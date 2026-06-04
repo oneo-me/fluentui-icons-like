@@ -134,7 +134,9 @@ export function IconCatalog({
                       : 'icon-tile'
                   }
                   style={{
+                    width: itemSize,
                     height: itemSize,
+                    aspectRatio: '1 / 1',
                     borderRadius: iconRadius,
                     color: effectiveSelectedColor,
                   }}
