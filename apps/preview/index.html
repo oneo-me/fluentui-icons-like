@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="oklch(0.985 0.004 255)" />
+    <meta property="og:site_name" content="FluentUI Icons Like" />
+    <meta property="og:type" content="website" />
+    <meta
+      name="description"
+      content="Browse, search, copy, and export Fluent UI System Icons for React, Svelte, and Avalonia." />
+    <title>FluentUI Icons Like</title>
+    <script>
+      const media = window.matchMedia('(prefers-color-scheme: dark)');
+
+      function applyThemeClass(event) {
+        document.documentElement.classList.toggle('dark', event.matches);
+      }
+
+      applyThemeClass(media);
+      media.addEventListener('change', applyThemeClass);
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

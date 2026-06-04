@@ -1,7 +1,7 @@
 {
-  "name": "@oneo/fluentui-icons-like",
+  "name": "@oneo/fluentui-icons-like-react",
   "version": "2.0.1",
-  "description": "Microsoft Fluent UI System Icons as Svelte 5 runes-mode components. Tree-shakable, type-safe SVG icons with zero dependencies — import only what you need.",
+  "description": "Microsoft Fluent UI System Icons as tree-shakable React SVG components.",
   "author": "ONEO",
   "license": "MIT",
   "homepage": "https://github.com/oneo-me/fluentui-icons-like#readme",
@@ -9,12 +9,10 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/oneo-me/fluentui-icons-like.git",
-    "directory": "packages/svelte"
+    "directory": "packages/react"
   },
   "keywords": [
-    "svelte",
-    "svelte5",
-    "sveltekit",
+    "react",
     "fluentui",
     "fluent-ui",
     "fluent",
@@ -24,44 +22,38 @@
     "svg-icons",
     "microsoft",
     "system-icons",
-    "tree-shakable",
-    "runes-mode"
+    "tree-shakable"
   ],
   "type": "module",
   "scripts": {
-    "build": "svelte-package -i src/lib/icons",
-    "prepack": "pnpm run build && publint",
-    "svelte-check": "svelte-check --tsconfig ./tsconfig.json",
-    "check": "biome check --write && pnpm run svelte-check",
+    "build": "tsc -p tsconfig.json",
+    "check": "biome check --write && tsc --noEmit -p tsconfig.json",
+    "prepack": "pnpm run build",
     "pack": "pnpm pack",
     "publish": "pnpm publish"
   },
   "peerDependencies": {
-    "svelte": "^5.0.0"
+    "react": ">=16.8.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.14",
-    "@sveltejs/package": "^2.5.7",
-    "@types/node": "^25.6.2",
-    "publint": "^0.3.20",
-    "svelte": "^5.55.5",
-    "svelte-check": "^4.4.8",
+    "@types/react": "^19.0.0",
     "typescript": "^6.0.3"
   },
   "publishConfig": {
     "access": "public"
   },
   "exports": {
-    "./*.svelte": {
-      "types": "./dist/*.svelte.d.ts",
-      "svelte": "./dist/*.svelte",
-      "default": "./dist/*.svelte"
+    "./package.json": "./package.json",
+    "./*": {
+      "types": "./dist/icons/*.d.ts",
+      "import": "./dist/icons/*.js"
     }
   },
   "files": [
-    "screenshot.png",
     "README.md",
     "logo.png",
+    "screenshot.png",
     "dist/**"
   ],
   "sideEffects": false,

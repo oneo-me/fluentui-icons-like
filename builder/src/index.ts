@@ -2,6 +2,7 @@
 
 import { generate } from './generate.js';
 import { avaloniaGenerator } from './generators/avalonia.js';
+import { reactGenerator } from './generators/react.js';
 import { svelteGenerator } from './generators/svelte.js';
 import { pack } from './pack.js';
 import { scanIcons } from './scan.js';
@@ -15,11 +16,17 @@ function main() {
       syncSource();
       break;
     case 'generate': {
-      const generatorName = process.argv[3] || 'svelte';
+      const generatorName =
+        process.argv[3] === '--'
+          ? process.argv[4] || 'svelte'
+          : process.argv[3] || 'svelte';
       const icons = scanIcons();
       switch (generatorName) {
         case 'avalonia':
           generate(avaloniaGenerator, icons);
+          break;
+        case 'react':
+          generate(reactGenerator, icons);
           break;
         case 'svelte':
           generate(svelteGenerator, icons);
@@ -40,7 +47,9 @@ function main() {
       break;
     }
     default:
-      console.error('Usage: builder <sync|generate [generator]|pack <version>>');
+      console.error(
+        'Usage: builder <sync|generate [generator]|pack <version>>',
+      );
       process.exit(1);
   }
 }

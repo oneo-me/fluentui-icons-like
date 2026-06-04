@@ -11,15 +11,18 @@
 | Package | Ecosystem | Status |
 | --- | --- | --- |
 | `@oneo/fluentui-icons-like` | npm | ![npm version](https://img.shields.io/npm/v/%40oneo%2Ffluentui-icons-like) |
+| `@oneo/fluentui-icons-like-react` | npm | ![npm version](https://img.shields.io/npm/v/%40oneo%2Ffluentui-icons-like-react) |
 | `ONEO.FluentUIIconsLike` | NuGet | ![NuGet Version](https://img.shields.io/nuget/v/ONEO.FluentUIIconsLike) |
 | `ONEO.FluentUIIconsLike.Generator` | NuGet | ![NuGet Version](https://img.shields.io/nuget/v/ONEO.FluentUIIconsLike.Generator) |
 
 ## Features
 
-- Fluent UI System Icons for Svelte and Avalonia
+- Fluent UI System Icons for Svelte, React, and Avalonia
 - Tree-shakable Svelte components
+- Tree-shakable React SVG components
 - Avalonia source generator workflow for referenced symbols
 - Shared generator pipeline for icon data
+- React + TanStack Router preview app for browsing and exporting icons
 
 ## Quick Use
 
@@ -46,6 +49,35 @@ Use icons in a Svelte component:
   <FluentIconAdd size={20} style="Regular" />
 </div>
 ```
+
+### React
+
+Install the package:
+
+```bash
+pnpm add @oneo/fluentui-icons-like-react
+```
+
+Use icons in a React component:
+
+```tsx
+import FluentIconAccessTime from '@oneo/fluentui-icons-like-react/FluentIconAccessTime';
+import FluentIconAccessibility from '@oneo/fluentui-icons-like-react/FluentIconAccessibility';
+import FluentIconAdd from '@oneo/fluentui-icons-like-react/FluentIconAdd';
+
+export function Example() {
+  return (
+    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+      <FluentIconAccessTime size={24} variant="Regular" />
+      <FluentIconAccessibility size={24} variant="Filled" />
+      <FluentIconAdd size={20} variant="Regular" />
+    </div>
+  );
+}
+```
+
+React icons accept standard SVG attributes plus `size`, `variant`, and `title`.
+Set `title={null}` to omit the generated SVG title element.
 
 ### Avalonia
 
@@ -101,13 +133,29 @@ Use the icon control in `axaml`:
 
 ```text
 .
+├── apps/
+│   └── preview/          # React + TanStack Router preview app
 ├── builder/              # icon build and generation scripts
 ├── packages/
-│   ├── svelte/           # Svelte package and preview app
+│   ├── svelte/           # Svelte package
+│   ├── react/            # React package
 │   └── avalonia/         # Avalonia library, generator, and demo
 ├── README.md
 └── LICENSE
 ```
+
+### Generator Targets
+
+The builder generates framework-specific artifacts from `.cache/source/assets`:
+
+```bash
+cd builder
+pnpm run generate -- svelte
+pnpm run generate -- react
+pnpm run generate -- avalonia
+```
+
+The React generator also writes the preview metadata used by `apps/preview`.
 
 ## License
 

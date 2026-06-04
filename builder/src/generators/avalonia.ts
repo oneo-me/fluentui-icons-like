@@ -4,7 +4,12 @@ import type { IconDefinition, SvgNode } from '../types.js';
 import { naturalCompare } from '../utils.js';
 import type { Generator } from './types.js';
 
-const RUNTIME_DIR = resolve(ROOT_DIR, 'packages', 'avalonia', 'FluentUIIconsLike');
+const RUNTIME_DIR = resolve(
+  ROOT_DIR,
+  'packages',
+  'avalonia',
+  'FluentUIIconsLike',
+);
 const GENERATOR_DIR = resolve(
   ROOT_DIR,
   'packages',
@@ -64,9 +69,15 @@ function toIconRecords(icons: IconDefinition[]): AvaloniaIconRecord[] {
 function generateSymbolEnum(records: AvaloniaIconRecord[]): string {
   const members = records.map((record) => `    ${record.symbol},`).join('\n');
   const styles = Array.from(
-    new Set(records.flatMap((record) => record.variants.map((variant) => variant.style))),
+    new Set(
+      records.flatMap((record) =>
+        record.variants.map((variant) => variant.style),
+      ),
+    ),
   ).sort(naturalCompare);
-  const styleMembers = styles.map((style) => `    ${toStyleName(style)},`).join('\n');
+  const styleMembers = styles
+    .map((style) => `    ${toStyleName(style)},`)
+    .join('\n');
 
   return `namespace FluentUIIconsLike;
 
@@ -92,7 +103,9 @@ function isSupportedNode(node: SvgNode): boolean {
   }
 
   if (node.name === 'path') {
-    return typeof node.attributes.d === 'string' && node.attributes.d.length > 0;
+    return (
+      typeof node.attributes.d === 'string' && node.attributes.d.length > 0
+    );
   }
 
   if (node.name === 'g') {

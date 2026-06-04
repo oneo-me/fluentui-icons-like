@@ -1,14 +1,11 @@
 import { resolve } from 'node:path';
 import { ROOT_DIR } from '../constants.js';
 import type { IconDefinition, SvgNode } from '../types.js';
-import { escapeXml, naturalCompare, pickBestSize, toTypeUnion } from '../utils.js';
+import { escapeXml, pickBestSize, toTypeUnion } from '../utils.js';
 import type { Generator } from './types.js';
 
 const PACKAGE_DIR = resolve(ROOT_DIR, 'packages', 'svelte');
 const ICONS_DIR = resolve(PACKAGE_DIR, 'src', 'lib', 'icons');
-const PREVIEW_DIR = resolve(PACKAGE_DIR, 'src', 'lib', 'preview');
-const PREVIEW_REGISTRY_PATH = resolve(PREVIEW_DIR, 'registry.ts');
-const PREVIEW_METADATA_PATH = resolve(PREVIEW_DIR, 'icons.json');
 
 const COMPONENT_PREFIX = 'FluentIcon';
 
@@ -19,21 +16,10 @@ function getComponentName(icon: IconDefinition): string {
 export const svelteGenerator: Generator = {
   name: 'svelte',
   generate(icons: IconDefinition[]) {
-    const files = icons.map((icon) => ({
+    return icons.map((icon) => ({
       path: resolve(ICONS_DIR, `${getComponentName(icon)}.svelte`),
       content: generateIcon(icon),
     }));
-
-    files.push({
-      path: PREVIEW_METADATA_PATH,
-      content: generatePreviewMetadata(icons),
-    });
-    files.push({
-      path: PREVIEW_REGISTRY_PATH,
-      content: generatePreviewRegistry(icons),
-    });
-
-    return files;
   },
 };
 
@@ -124,85 +110,6 @@ ${markup}
     max-height: 100%;
   }
 </style>
-`;
-}
-
-function generatePreviewMetadata(icons: IconDefinition[]): string {
-  const sortedIcons = [...icons].sort((a, b) => naturalCompare(a.key, b.key));
-  const metadata = sortedIcons.map((icon) => ({
-    key: icon.key,
-    name: icon.name,
-    sizes: icon.sizes,
-    styles: icon.styles,
-    keyword: icon.keyword,
-    description: icon.description,
-    metaphor: icon.metaphor,
-    directionType: icon.directionType,
-    singleton: icon.singleton,
-  }));
-
-  return `${JSON.stringify(metadata)}\n`;
-}
-
-function generatePreviewRegistry(icons: IconDefinition[]): string {
-  const iconStyles = Array.from(
-    new Set(icons.flatMap((icon) => icon.styles)),
-  ).sort((a, b) => a.localeCompare(b));
-
-  return `import type { Component } from 'svelte';
-import type { SVGAttributes } from 'svelte/elements';
-
-export type PreviewIconStyle = ${toTypeUnion(iconStyles)};
-
-export type PreviewIconProps = Omit<SVGAttributes<SVGSVGElement>, 'style' | 'title'> & {
-  size?: number;
-  style?: PreviewIconStyle;
-  title?: string | null;
-};
-
-export type PreviewIconModule = { default: Component<PreviewIconProps> };
-
-export interface PreviewIconMetadata {
-  key: string;
-  name: string;
-  sizes: number[];
-  styles: PreviewIconStyle[];
-  keyword: string;
-  description: string;
-  metaphor: string[];
-  directionType: string | null;
-  singleton: string | null;
-}
-
-export interface PreviewIconEntry extends PreviewIconMetadata {
-  load: () => Promise<PreviewIconModule>;
-}
-
-const loaders = import.meta.glob('../icons/${COMPONENT_PREFIX}*.svelte') as Record<
-  string,
-  () => Promise<PreviewIconModule>
->;
-
-function getLoader(key: string): () => Promise<PreviewIconModule> {
-  const componentName = \`${COMPONENT_PREFIX}\${key.replace(/_/g, '')}\`;
-  const loader = loaders[\`../icons/\${componentName}.svelte\`];
-  if (!loader) {
-    throw new Error(\`Icon module not found: \${componentName}\`);
-  }
-  return loader;
-}
-
-let cached: Promise<PreviewIconEntry[]> | null = null;
-
-export function loadRegistry(): Promise<PreviewIconEntry[]> {
-  if (!cached) {
-    cached = import('./icons.json').then((module) => {
-      const metadata = module.default as PreviewIconMetadata[];
-      return metadata.map((entry) => ({ ...entry, load: getLoader(entry.key) }));
-    });
-  }
-  return cached;
-}
 `;
 }
 

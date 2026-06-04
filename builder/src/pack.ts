@@ -1,29 +1,53 @@
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { ROOT_DIR } from './constants.js';
 
 const PUBLISH_DIR = path.resolve(ROOT_DIR, 'publish');
 const SVELTE_DIR = path.resolve(ROOT_DIR, 'packages', 'svelte');
+const REACT_DIR = path.resolve(ROOT_DIR, 'packages', 'react');
 const AVALONIA_DIR = path.resolve(ROOT_DIR, 'packages', 'avalonia');
-const AVALONIA_VERSION_PROPS = path.resolve(AVALONIA_DIR, 'Directory.Build.props');
+const AVALONIA_VERSION_PROPS = path.resolve(
+  AVALONIA_DIR,
+  'Directory.Build.props',
+);
 const ROOT_README_PATH = path.resolve(ROOT_DIR, 'README.md');
 const ROOT_LOGO_PATH = path.resolve(ROOT_DIR, 'logo.png');
 const ROOT_SCREENSHOT_PATH = path.resolve(ROOT_DIR, 'screenshot.png');
-const SVELTE_STATIC_LOGO_PATH = path.resolve(SVELTE_DIR, 'static', 'logo.png');
-const SVELTE_BUILD_DIRS = [
-  path.resolve(SVELTE_DIR, 'dist'),
-  path.resolve(SVELTE_DIR, '.svelte-kit'),
-];
 
-const npmPackage = {
-  name: '@oneo/fluentui-icons-like',
-  directory: SVELTE_DIR,
-  manifestPath: path.resolve(SVELTE_DIR, 'package.json'),
-  readmePath: path.resolve(SVELTE_DIR, 'README.md'),
-  logoPath: path.resolve(SVELTE_DIR, 'logo.png'),
-  screenshotPath: path.resolve(SVELTE_DIR, 'screenshot.png'),
-};
+interface NpmPackage {
+  name: string;
+  directory: string;
+  manifestPath: string;
+  readmePath: string;
+  logoPath: string;
+  screenshotPath: string;
+  buildDirectories: string[];
+}
+
+const npmPackages: NpmPackage[] = [
+  {
+    name: '@oneo/fluentui-icons-like',
+    directory: SVELTE_DIR,
+    manifestPath: path.resolve(SVELTE_DIR, 'package.json'),
+    readmePath: path.resolve(SVELTE_DIR, 'README.md'),
+    logoPath: path.resolve(SVELTE_DIR, 'logo.png'),
+    screenshotPath: path.resolve(SVELTE_DIR, 'screenshot.png'),
+    buildDirectories: [
+      path.resolve(SVELTE_DIR, 'dist'),
+      path.resolve(SVELTE_DIR, '.svelte-kit'),
+    ],
+  },
+  {
+    name: '@oneo/fluentui-icons-like-react',
+    directory: REACT_DIR,
+    manifestPath: path.resolve(REACT_DIR, 'package.json'),
+    readmePath: path.resolve(REACT_DIR, 'README.md'),
+    logoPath: path.resolve(REACT_DIR, 'logo.png'),
+    screenshotPath: path.resolve(REACT_DIR, 'screenshot.png'),
+    buildDirectories: [path.resolve(REACT_DIR, 'dist')],
+  },
+];
 
 const nugetPackages = [
   {
@@ -52,15 +76,20 @@ export function pack(version: string): void {
   cleanPackArtifacts();
   fs.mkdirSync(PUBLISH_DIR, { recursive: true });
 
-  setNpmPackageVersion(version);
+  setNpmPackageVersions(version);
   setNugetPackageVersions(version);
 
-  const npmArchive = packNpmPackage(version);
-  copyArtifactToPublishDir(npmArchive);
-  fs.rmSync(npmArchive, { force: true });
+  for (const npmPackage of npmPackages) {
+    const npmArchive = packNpmPackage(npmPackage, version);
+    copyArtifactToPublishDir(npmArchive);
+    fs.rmSync(npmArchive, { force: true });
+  }
 
   for (const nugetPackage of nugetPackages) {
-    const artifact = packNugetPackage(nugetPackage.projectPath, nugetPackage.packageId);
+    const artifact = packNugetPackage(
+      nugetPackage.projectPath,
+      nugetPackage.packageId,
+    );
     copyArtifactToPublishDir(artifact);
   }
 
@@ -71,9 +100,11 @@ function cleanPackArtifacts(): void {
   resetDirectory(PUBLISH_DIR);
   console.log(`  Cleared ${path.relative(ROOT_DIR, PUBLISH_DIR)}`);
 
-  for (const directoryPath of SVELTE_BUILD_DIRS) {
-    removeDirectoryIfExists(directoryPath);
-    console.log(`  Cleared ${path.relative(ROOT_DIR, directoryPath)}`);
+  for (const npmPackage of npmPackages) {
+    for (const directoryPath of npmPackage.buildDirectories) {
+      removeDirectoryIfExists(directoryPath);
+      console.log(`  Cleared ${path.relative(ROOT_DIR, directoryPath)}`);
+    }
   }
 
   for (const nugetPackage of nugetPackages) {
@@ -86,16 +117,18 @@ function cleanPackArtifacts(): void {
   }
 }
 
-function setNpmPackageVersion(version: string): void {
-  const manifest = JSON.parse(
-    fs.readFileSync(npmPackage.manifestPath, 'utf8'),
-  ) as Record<string, unknown>;
-  manifest.version = version;
-  fs.writeFileSync(
-    npmPackage.manifestPath,
-    `${JSON.stringify(manifest, null, 2)}\n`,
-  );
-  console.log(`  Set ${npmPackage.name} version to ${version}`);
+function setNpmPackageVersions(version: string): void {
+  for (const npmPackage of npmPackages) {
+    const manifest = JSON.parse(
+      fs.readFileSync(npmPackage.manifestPath, 'utf8'),
+    ) as Record<string, unknown>;
+    manifest.version = version;
+    fs.writeFileSync(
+      npmPackage.manifestPath,
+      `${JSON.stringify(manifest, null, 2)}\n`,
+    );
+    console.log(`  Set ${npmPackage.name} version to ${version}`);
+  }
 }
 
 function setNugetPackageVersions(version: string): void {
@@ -103,12 +136,11 @@ function setNugetPackageVersions(version: string): void {
   console.log(`  Set Avalonia package version to ${version}`);
 }
 
-function packNpmPackage(version: string): string {
+function packNpmPackage(npmPackage: NpmPackage, version: string): string {
   console.log(`  Packing ${npmPackage.name}...`);
-  installNpmPackageDependencies();
-  syncSvelteStaticAssets();
-  copyNpmPackageMetadata();
-  removeNpmArchives();
+  installNpmPackageDependencies(npmPackage);
+  copyNpmPackageMetadata(npmPackage);
+  removeNpmArchives(npmPackage);
   try {
     execFileSync('pnpm', ['pack'], {
       cwd: npmPackage.directory,
@@ -116,7 +148,7 @@ function packNpmPackage(version: string): string {
       stdio: ['ignore', 'pipe', 'inherit'],
     });
 
-    const archivePath = findNpmArchive();
+    const archivePath = findNpmArchive(npmPackage);
 
     console.log(`  Packed ${npmPackage.name} ${version}`);
     return archivePath;
@@ -127,25 +159,20 @@ function packNpmPackage(version: string): string {
   }
 }
 
-function installNpmPackageDependencies(): void {
+function installNpmPackageDependencies(npmPackage: NpmPackage): void {
   execFileSync('pnpm', ['install', '--frozen-lockfile', '--ignore-scripts'], {
     cwd: npmPackage.directory,
     stdio: 'inherit',
   });
 }
 
-function syncSvelteStaticAssets(): void {
-  fs.mkdirSync(path.dirname(SVELTE_STATIC_LOGO_PATH), { recursive: true });
-  fs.copyFileSync(ROOT_LOGO_PATH, SVELTE_STATIC_LOGO_PATH);
-}
-
-function copyNpmPackageMetadata(): void {
+function copyNpmPackageMetadata(npmPackage: NpmPackage): void {
   fs.copyFileSync(ROOT_README_PATH, npmPackage.readmePath);
   fs.copyFileSync(ROOT_LOGO_PATH, npmPackage.logoPath);
   fs.copyFileSync(ROOT_SCREENSHOT_PATH, npmPackage.screenshotPath);
 }
 
-function removeNpmArchives(): void {
+function removeNpmArchives(npmPackage: NpmPackage): void {
   for (const entry of fs.readdirSync(npmPackage.directory)) {
     if (entry.endsWith('.tgz')) {
       fs.rmSync(path.resolve(npmPackage.directory, entry), { force: true });
@@ -153,7 +180,7 @@ function removeNpmArchives(): void {
   }
 }
 
-function findNpmArchive(): string {
+function findNpmArchive(npmPackage: NpmPackage): string {
   const archives = fs
     .readdirSync(npmPackage.directory)
     .filter((entry) => entry.endsWith('.tgz'));
@@ -190,7 +217,10 @@ function packNugetPackage(projectPath: string, packageId: string): string {
 }
 
 function copyArtifactToPublishDir(artifactPath: string): void {
-  const destinationPath = path.resolve(PUBLISH_DIR, path.basename(artifactPath));
+  const destinationPath = path.resolve(
+    PUBLISH_DIR,
+    path.basename(artifactPath),
+  );
   if (artifactPath !== destinationPath) {
     fs.copyFileSync(artifactPath, destinationPath);
   }
