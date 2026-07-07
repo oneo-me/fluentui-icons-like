@@ -1,6 +1,6 @@
 {
   "name": "fluentui-icons-like",
-  "version": "2.1.0-preview.0",
+  "version": "2.1.0",
   "private": true,
   "description": "Monorepo for Microsoft Fluent UI System Icons across Svelte, React, and Avalonia.",
   "license": "MIT",
@@ -12,11 +12,12 @@
     "check": "biome check --write . && pnpm --filter builder run check && pnpm --filter @oneo/fluentui-icons-like run check && pnpm --filter @oneo/fluentui-icons-like-react run check && pnpm --filter preview run check",
     "sync": "pnpm --filter builder run sync",
     "gen": "pnpm --filter builder run generate",
-    "pack": "pnpm --filter builder run pack"
+    "pack": "pnpm --filter builder run pack",
+    "up": "pnpm -r up -L"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.16",
-    "wrangler": "^4.97.0"
+    "@biomejs/biome": "^2.5.2",
+    "wrangler": "^4.107.0"
   },
-  "packageManager": "pnpm@11.5.1+sha512.93f7b57422ea7068257235b4c16eb60762eb68e1dc23723199cc739043ea9be2c4143274a399d8c6defa2b1176226d9ca1c4b63482d6200c1a8fbaa78c1d1485"
+  "packageManager": "pnpm@11.10.0+sha512.0b7f8b98060031904c017e3a41eb187a16d40eeb829b95c4f8cb03681761fc4ab53dd219115b9b447f4dce1a05a214764461e7d3703392a9f32f9511ce8c86c8"
 }
