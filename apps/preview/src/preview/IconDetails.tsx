@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '#components/ui/button';
 import { cn } from '#lib/utils';
+import packageManifest from '../../../../package.json';
 import ArrowDownloadIcon from '../../../../packages/react/src/icons/FluentIconArrowDownload';
 import CodeIcon from '../../../../packages/react/src/icons/FluentIconCode';
 import CopyIcon from '../../../../packages/react/src/icons/FluentIconCopy';
@@ -33,7 +34,7 @@ const svelteDefaultSize = 20;
 const svelteDefaultStyle = 'Regular';
 const avaloniaDefaultSize = 24;
 const avaloniaDefaultStyle = 'Regular';
-const packageVersion = '2.1.0-preview.0';
+const packageVersion = packageManifest.version;
 const packageTabStorageKey = 'fluentui-icons-like:active-package-tab';
 const detailPanelClassName =
   'relative min-h-0 min-w-0 overflow-hidden border-l border-[var(--preview-border)] bg-[var(--preview-background)] text-[var(--preview-foreground)] max-[980px]:hidden';
