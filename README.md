@@ -184,6 +184,8 @@ bun run pack
 
 `bun run gen` writes all generated package artifacts, including the preview icon metadata at `apps/preview/src/preview/icons.json`. Pass a generator name to limit output to one target.
 
+The builder, React package, and preview use TypeScript 7. The Svelte package uses TypeScript 6 because `svelte-check` and `svelte-package` require the JavaScript compiler API.
+
 `apps/builder` runs TypeScript source directly with Bun. Workspace packages are defined in the root `package.json`; `trustedDependencies` authorizes dependency install scripts, and `bunfig.toml` makes Bun the runtime for package scripts and their CLI tools.
 
 The React generator also writes the preview metadata used by `apps/preview`.

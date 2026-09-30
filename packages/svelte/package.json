@@ -1,7 +1,7 @@
 {
   "name": "@oneo/fluentui-icons-like",
   "version": "2.1.1",
-  "description": "Microsoft Fluent UI System Icons as Svelte 5 runes-mode components. Tree-shakable, type-safe SVG icons with zero dependencies \u2014 import only what you need.",
+  "description": "Microsoft Fluent UI System Icons as Svelte 5 runes-mode components. Tree-shakable, type-safe SVG icons with zero dependencies — import only what you need.",
   "author": "ONEO",
   "license": "MIT",
   "homepage": "https://github.com/oneo-me/fluentui-icons-like#readme",
@@ -41,11 +41,11 @@
   },
   "devDependencies": {
     "@sveltejs/package": "^2.5.8",
-    "@types/node": "^26.2.0",
-    "publint": "^0.3.23",
-    "svelte": "^5.56.8",
-    "svelte-check": "^4.7.5",
-    "typescript": "^6.0.3"
+    "@types/node": "^26.6.3",
+    "publint": "^0.3.24",
+    "svelte": "^5.57.1",
+    "svelte-check": "^4.7.6",
+    "typescript": "~6"
   },
   "publishConfig": {
     "access": "public"
