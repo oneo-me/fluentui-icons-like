@@ -21,6 +21,9 @@ function main() {
           ? process.argv[4] || 'all'
           : process.argv[3] || 'all';
       const icons = scanIcons();
+      if (icons.length === 0) {
+        throw new Error('No icons found in the upstream assets');
+      }
       switch (generatorName) {
         case 'all':
           generate(svelteGenerator, icons);

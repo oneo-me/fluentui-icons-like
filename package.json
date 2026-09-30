@@ -16,7 +16,8 @@
     "pack": "bun run --bun --filter builder pack",
     "up": "bun update --latest --recursive",
     "lint": "oxlint --deny-warnings .",
-    "format": "oxfmt --write ."
+    "format": "oxfmt --write .",
+    "test": "bun test ./scripts/release.test.mjs"
   },
   "devDependencies": {
     "oxfmt": "^0.71.0",

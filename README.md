@@ -172,6 +172,7 @@ bun run check
 bun run check:ci
 bun run lint
 bun run format
+bun run test
 bun run sync
 bun run gen
 bun run gen -- svelte
@@ -195,6 +196,24 @@ The React generator also writes the preview metadata used by `apps/preview`.
 `apps/preview/src/styles.css` is reserved for Tailwind/shadcn imports, design tokens, base rules, and shared keyframes. Component-specific layout, state, and responsive styling belong in the relevant React component as Tailwind classes.
 
 The preview icon catalog uses `@tanstack/react-virtual` for row virtualization. The catalog owns viewport measurement and derives tile size, columns, and row height from the selected icon size and display scale.
+
+### Automatic Upstream Releases
+
+`.github/workflows/upstream-release.yml` checks daily at 03:23 UTC. A new release is eligible 30 days after the last successful automatic release and is published only when the upstream `assets` tree changes. The first run is eligible immediately. Manual runs use the same interval and recovery rules.
+
+The workflow clones the public upstream over HTTPS, generates all targets from the same commit, checks the workspace packages, builds the preview and Avalonia solution, and packs all four packages. It chooses the next shared patch version above the root version, stable registry versions, and existing GitHub tags/releases. Package versions are updated in the build workspace; the root version in the default branch remains the local packing baseline.
+
+Before publishing, all four archives and their checksums are saved in a GitHub Release draft. Failed package publication resumes from those exact archives on the next run, without rebuilding or choosing a new version. Existing npm versions must match the saved archive's integrity. The Release becomes public only after all four packages have been accepted. npm and NuGet publication is sequential, so partial availability is possible until a retry succeeds. A draft with missing or damaged assets stops publication and requires restoring its original assets.
+
+One-time setup:
+
+1. Add the Actions secret `NPM_TOKEN`, with publish access to **both** npm packages and permission to publish without an interactive 2FA prompt. The workflow passes it to [Bun publishing](https://bun.com/docs/pm/cli/publish) as `NPM_CONFIG_TOKEN`. Renew it before expiry.
+2. Add the Actions secret `NUGET_API_KEY`, scoped to publish both NuGet package IDs. Renew it before expiry.
+3. Put the workflow on the default branch and enable GitHub Actions. `GITHUB_TOKEN` needs the workflow's `contents: write` permission to create releases and upload archives.
+
+The preview is built as a validation step; Cloudflare deployment remains independent. Generated files and version changes are included in published archives, while GitHub release tags identify the generator source commit and the release body identifies the upstream commit.
+
+[GitHub scheduled workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) can be delayed and are disabled in public repositories after 60 days without repository activity. This automation therefore depends on the schedule remaining enabled; it is not an exact-time timer. Run `bun run test` to check interval, version selection, metadata validation, draft recovery, registry failures, and publication requests against mocked services without publishing.
 
 ## License
 
