@@ -99,8 +99,7 @@ export function IconDetails({
     return (
       <aside
         className={detailPanelClassName}
-        aria-label="Selected icon details"
-      >
+        aria-label="Selected icon details">
         <div className={detailScrollClassName}>
           <div className={emptyStateClassName}>
             <strong className="text-base text-[var(--preview-foreground)]">
@@ -116,14 +115,14 @@ export function IconDetails({
   const icon = selectedIcon;
   const componentName = `FluentIcon${icon.key.replace(/_/g, '')}`;
   const avaloniaSymbol = icon.key.replace(/_/g, '');
-  const reactInstallSnippet = `pnpm add @oneo/fluentui-icons-like-react@${packageVersion}`;
+  const reactInstallSnippet = `bun add @oneo/fluentui-icons-like-react@${packageVersion}`;
   const reactImportSnippet = `import ${componentName} from '@oneo/fluentui-icons-like-react/${componentName}';`;
   const reactIconSnippet = buildReactIconSnippet(
     componentName,
     selectedSize,
     selectedStyle,
   );
-  const svelteInstallSnippet = `pnpm add @oneo/fluentui-icons-like@${packageVersion}`;
+  const svelteInstallSnippet = `bun add @oneo/fluentui-icons-like@${packageVersion}`;
   const svelteImportSnippet = `import ${componentName} from '@oneo/fluentui-icons-like/${componentName}.svelte';`;
   const svelteIconSnippet = buildSvelteIconSnippet(
     componentName,
@@ -246,8 +245,7 @@ export function IconDetails({
       <div className={detailScrollClassName}>
         <div
           className="grid overflow-hidden border-b border-[var(--preview-border)] bg-[var(--preview-panel-strong)]"
-          style={{ color: selectedColor }}
-        >
+          style={{ color: selectedColor }}>
           <div className={previewGridClassName}>
             <LazyIcon
               icon={icon}
@@ -262,8 +260,7 @@ export function IconDetails({
               variant="ghost"
               className={previewActionButtonClassName}
               aria-label="Download SVG"
-              onClick={downloadSvg}
-            >
+              onClick={downloadSvg}>
               <ArrowDownloadIcon
                 size={16}
                 variant={selectedStyle}
@@ -276,8 +273,7 @@ export function IconDetails({
               variant="ghost"
               className={previewActionButtonClassName}
               aria-label="Download PNG"
-              onClick={downloadPng}
-            >
+              onClick={downloadPng}>
               <ImageIcon size={16} variant={selectedStyle} title={null} />
               <span>PNG</span>
             </Button>
@@ -292,8 +288,7 @@ export function IconDetails({
               data-copy-pulse={pulse % 2 === 0 ? 'even' : 'odd'}
               aria-label="Copy SVG code"
               title={copiedSvg ? 'Copied' : 'Copy SVG code'}
-              onClick={copySvgCode}
-            >
+              onClick={copySvgCode}>
               {copiedSvg ? (
                 <CopyIcon size={16} variant={selectedStyle} title={null} />
               ) : (
@@ -308,8 +303,7 @@ export function IconDetails({
           className="pointer-events-none absolute size-0 overflow-hidden opacity-0"
           aria-hidden="true"
           ref={sourcePreviewRef}
-          style={{ color: selectedColor }}
-        >
+          style={{ color: selectedColor }}>
           <LazyIcon
             icon={icon}
             size={selectedSize}
@@ -322,8 +316,7 @@ export function IconDetails({
           <div
             className="grid grid-cols-3 gap-1"
             role="tablist"
-            aria-label="Package usage"
-          >
+            aria-label="Package usage">
             {packageTabs.map((tab) => (
               <Button
                 key={tab.id}
@@ -337,8 +330,7 @@ export function IconDetails({
                   packageTabClassName,
                   activePackage === tab.id && packageTabActiveClassName,
                 )}
-                onClick={() => setActivePackage(tab.id)}
-              >
+                onClick={() => setActivePackage(tab.id)}>
                 {tab.label}
               </Button>
             ))}
@@ -492,8 +484,7 @@ function PackageUsagePanel({
       role="tabpanel"
       id={`${activePackage}-usage-panel`}
       aria-labelledby={`${activePackage}-usage-tab`}
-      className="grid gap-2"
-    >
+      className="grid gap-2">
       <dl className="m-0 grid">
         {activePackage === 'react' ? (
           <>
@@ -599,8 +590,7 @@ function DetailValue({
         className={cn(
           detailValueClassName,
           'flex items-start justify-between gap-2',
-        )}
-      >
+        )}>
         <span>{value}</span>
         <CopyButton
           copied={copied}
@@ -633,8 +623,7 @@ function SnippetRow({
         className={cn(
           detailValueClassName,
           'flex items-start justify-between gap-2',
-        )}
-      >
+        )}>
         <code className="min-w-0 flex-1 rounded-md border border-[color-mix(in_oklab,var(--preview-border)_72%,transparent)] bg-[color-mix(in_oklab,var(--preview-panel-strong)_72%,var(--preview-background))] px-[7px] py-1.5 font-mono text-[11px] leading-[1.55] whitespace-pre-wrap [overflow-wrap:anywhere]">
           {snippet}
         </code>
@@ -666,8 +655,7 @@ function TagRow({ label, tags }: { label: string; tags: string[] }) {
         {tags.map((tag) => (
           <span
             key={tag}
-            className="max-w-full overflow-hidden rounded-full border border-[var(--preview-border)] bg-[color-mix(in_oklab,var(--preview-panel-strong)_68%,var(--preview-background))] px-[7px] py-[3px] text-[10px] text-ellipsis whitespace-nowrap text-[var(--preview-foreground)]"
-          >
+            className="max-w-full overflow-hidden rounded-full border border-[var(--preview-border)] bg-[color-mix(in_oklab,var(--preview-panel-strong)_68%,var(--preview-background))] px-[7px] py-[3px] text-[10px] text-ellipsis whitespace-nowrap text-[var(--preview-foreground)]">
             {tag}
           </span>
         ))}
@@ -697,8 +685,7 @@ function CopyButton({
       data-copy-pulse={pulse % 2 === 0 ? 'even' : 'odd'}
       aria-label={label}
       title={copied ? 'Copied' : label}
-      onClick={onClick}
-    >
+      onClick={onClick}>
       <CopyIcon size={16} title={null} />
     </Button>
   );

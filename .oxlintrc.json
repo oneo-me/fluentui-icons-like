@@ -1,0 +1,21 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "jsx-a11y", "unicorn", "oxc"],
+  "categories": {
+    "correctness": "error"
+  },
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/.svelte-kit/**",
+    "**/.wrangler/**",
+    "apps/preview/src/components/ui/**",
+    "packages/avalonia/**",
+    "packages/react/src/icons/**",
+    "packages/svelte/src/lib/icons/**"
+  ],
+  "rules": {
+    "react/set-state-in-effect": "off",
+    "react/incompatible-library": "off"
+  }
+}

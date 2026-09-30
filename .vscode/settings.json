@@ -2,8 +2,8 @@
   "files.associations": {
     "*.css": "tailwindcss"
   },
-  "npm.scriptRunner": "pnpm",
-  "editor.defaultFormatter": "biomejs.biome",
+  "npm.scriptRunner": "bun",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
   "editor.formatOnSave": true,
   "editor.formatOnSaveMode": "file"
 }

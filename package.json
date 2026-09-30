@@ -6,18 +6,32 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "pnpm --filter preview run dev",
-    "build": "pnpm --filter preview run build",
-    "deploy": "pnpm run build && wrangler deploy",
-    "check": "biome check --write . && pnpm --filter builder run check && pnpm --filter @oneo/fluentui-icons-like run check && pnpm --filter @oneo/fluentui-icons-like-react run check && pnpm --filter preview run check",
-    "sync": "pnpm --filter builder run sync",
-    "gen": "pnpm --filter builder run generate",
-    "pack": "pnpm --filter builder run pack",
-    "up": "pnpm -r up -L"
+    "dev": "bun run --bun --filter preview dev",
+    "build": "bun run --bun --filter preview build",
+    "deploy": "bun run build && wrangler deploy",
+    "check": "oxlint --fix --deny-warnings . && bun run format && bun run --bun --filter builder check && bun run --bun --filter @oneo/fluentui-icons-like check && bun run --bun --filter @oneo/fluentui-icons-like-react check && bun run --bun --filter preview check",
+    "check:ci": "bun run lint && oxfmt --check . && bun run --bun --filter builder check && bun run --bun --filter @oneo/fluentui-icons-like check && bun run --bun --filter @oneo/fluentui-icons-like-react check && bun run --bun --filter preview check",
+    "sync": "bun run --bun --filter builder sync",
+    "gen": "bun run --bun --filter builder generate",
+    "pack": "bun run --bun --filter builder pack",
+    "up": "bun update --latest --recursive",
+    "lint": "oxlint --deny-warnings .",
+    "format": "oxfmt --write ."
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.5.7",
+    "oxfmt": "^0.71.0",
+    "oxlint": "^1.86.0",
     "wrangler": "^4.120.0"
   },
-  "packageManager": "pnpm@11.21.0+sha512.521705bce689924eac72f5a3587122f362689ef6571e55ba80076fd637c11132ecffada26fad4ea79c485bfddbfd3d5a2a5b05805a77e893de71ec8a6cca3bb1"
+  "packageManager": "bun@1.4.2",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "trustedDependencies": [
+    "esbuild",
+    "msw",
+    "sharp",
+    "workerd"
+  ]
 }

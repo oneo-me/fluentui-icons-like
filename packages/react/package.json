@@ -28,9 +28,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "check": "tsc --noEmit -p tsconfig.json",
-    "prepack": "pnpm run build",
-    "pack": "pnpm pack",
-    "publish": "pnpm publish"
+    "prepack": "bun run build",
+    "pack": "bun pm pack",
+    "publish": "bun publish"
   },
   "peerDependencies": {
     "react": ">=16.8.0"

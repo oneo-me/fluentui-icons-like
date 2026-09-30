@@ -131,8 +131,7 @@ export function IconCatalog({
         <div className="flex min-w-0 items-center justify-end gap-2 max-[760px]:justify-start">
           <label
             className="grid size-9 flex-none cursor-pointer place-items-center rounded-[7px] border border-[var(--preview-border)] bg-[var(--preview-background)] shadow-[0_1px_2px_var(--preview-shadow)]"
-            title="Choose icon color"
-          >
+            title="Choose icon color">
             <span className="sr-only">Choose icon color</span>
             <input
               type="color"
@@ -150,8 +149,7 @@ export function IconCatalog({
               'h-9 px-2.5 disabled:pointer-events-auto disabled:cursor-default disabled:opacity-[0.45]',
             )}
             onClick={() => onColorChange('')}
-            disabled={selectedColor === ''}
-          >
+            disabled={selectedColor === ''}>
             Reset
           </Button>
           <fieldset className="m-0 grid grid-cols-3 gap-1 border-0 p-0">
@@ -168,8 +166,7 @@ export function IconCatalog({
                   selectedScale === scale && toolbarControlActiveClassName,
                 )}
                 aria-pressed={selectedScale === scale}
-                onClick={() => onSelectScale(scale)}
-              >
+                onClick={() => onSelectScale(scale)}>
                 {scale}x
               </Button>
             ))}
@@ -179,8 +176,7 @@ export function IconCatalog({
 
       <div
         ref={scrollRef}
-        className="relative min-h-0 flex-1 overflow-y-auto bg-[var(--preview-background)]"
-      >
+        className="relative min-h-0 flex-1 overflow-y-auto bg-[var(--preview-background)]">
         {filtered.length === 0 ? (
           <div className="grid min-h-[220px] place-items-center content-center gap-1.5 text-center text-[var(--preview-muted)]">
             <strong className="text-base text-[var(--preview-foreground)]">
@@ -211,8 +207,7 @@ export function IconCatalog({
                     style={{
                       gridTemplateColumns,
                       transform: `translateY(${virtualRow.start + gridPadding}px)`,
-                    }}
-                  >
+                    }}>
                     {rowIcons.map((icon) => (
                       <Button
                         key={icon.key}
@@ -234,8 +229,7 @@ export function IconCatalog({
                           } as CSSProperties
                         }
                         title={icon.description || icon.name}
-                        onClick={() => onSelectIcon(icon)}
-                      >
+                        onClick={() => onSelectIcon(icon)}>
                         <LazyIcon
                           icon={icon}
                           size={displaySize}

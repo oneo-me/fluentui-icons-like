@@ -1,0 +1,22 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "bracketSameLine": true,
+  "printWidth": 80,
+  "ignorePatterns": [
+    "**/dist/**",
+    "**/node_modules/**",
+    "**/.svelte-kit/**",
+    "**/.wrangler/**",
+    "bun.lock",
+    "apps/preview/src/components/ui/**",
+    "packages/avalonia/**",
+    "packages/react/src/icons/**",
+    "packages/svelte/src/lib/icons/**",
+    "apps/preview/src/preview/icons.json"
+  ],
+  "sortImports": {
+    "newlinesBetween": false
+  },
+  "sortPackageJson": false
+}

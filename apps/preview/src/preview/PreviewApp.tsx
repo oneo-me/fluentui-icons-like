@@ -339,10 +339,7 @@ function getSearchText(icon: PreviewIconEntry) {
 
 function matchesSearch(icon: PreviewIconEntry, keyword: string) {
   const terms = keyword.trim().toLowerCase().split(/\s+/).filter(Boolean);
-  return (
-    terms.length === 0 ||
-    terms.every((term) => getSearchText(icon).includes(term))
-  );
+  return terms.every((term) => getSearchText(icon).includes(term));
 }
 
 function getValidScale(scale: number | undefined) {

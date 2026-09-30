@@ -8,12 +8,12 @@
 
 ## Packages
 
-| Package | Ecosystem | Status |
-| --- | --- | --- |
-| `@oneo/fluentui-icons-like` | npm | ![npm version](https://img.shields.io/npm/v/%40oneo%2Ffluentui-icons-like) |
-| `@oneo/fluentui-icons-like-react` | npm | ![npm version](https://img.shields.io/npm/v/%40oneo%2Ffluentui-icons-like-react) |
-| `ONEO.FluentUIIconsLike` | NuGet | ![NuGet Version](https://img.shields.io/nuget/v/ONEO.FluentUIIconsLike) |
-| `ONEO.FluentUIIconsLike.Generator` | NuGet | ![NuGet Version](https://img.shields.io/nuget/v/ONEO.FluentUIIconsLike.Generator) |
+| Package                            | Ecosystem | Status                                                                            |
+| ---------------------------------- | --------- | --------------------------------------------------------------------------------- |
+| `@oneo/fluentui-icons-like`        | npm       | ![npm version](https://img.shields.io/npm/v/%40oneo%2Ffluentui-icons-like)        |
+| `@oneo/fluentui-icons-like-react`  | npm       | ![npm version](https://img.shields.io/npm/v/%40oneo%2Ffluentui-icons-like-react)  |
+| `ONEO.FluentUIIconsLike`           | NuGet     | ![NuGet Version](https://img.shields.io/nuget/v/ONEO.FluentUIIconsLike)           |
+| `ONEO.FluentUIIconsLike.Generator` | NuGet     | ![NuGet Version](https://img.shields.io/nuget/v/ONEO.FluentUIIconsLike.Generator) |
 
 ## Features
 
@@ -31,7 +31,7 @@
 Install the package:
 
 ```bash
-pnpm add @oneo/fluentui-icons-like
+bun add @oneo/fluentui-icons-like
 ```
 
 Use icons in a Svelte component:
@@ -55,7 +55,7 @@ Use icons in a Svelte component:
 Install the package:
 
 ```bash
-pnpm add @oneo/fluentui-icons-like-react
+bun add @oneo/fluentui-icons-like-react
 ```
 
 Use icons in a React component:
@@ -125,15 +125,14 @@ Use the icon control in `axaml`:
 
 ### Environment
 
-- Node.js 22+
-- pnpm 11+
+- Bun 1.4.2 (runtime and package manager)
 - Wrangler 4
 - .NET SDK 10.0.0
 
-Install Node dependencies from the repository root:
+Install workspace dependencies from the repository root:
 
 ```bash
-pnpm install
+bun install
 ```
 
 The root workspace manages all Node packages. Use the root lockfile and avoid installing dependencies from individual package directories.
@@ -142,10 +141,12 @@ The root workspace manages all Node packages. Use the root lockfile and avoid in
 
 ```text
 .
-├── pnpm-workspace.yaml   # pnpm workspace packages and build approvals
+├── bun.lock              # shared workspace dependency lockfile
+├── bunfig.toml           # Bun runtime configuration
 ├── package.json          # root scripts for preview dev, deployment, checks, sync, generation, and packing
 ├── wrangler.jsonc        # Cloudflare Workers Assets config for preview deployment
-├── biome.jsonc           # shared formatter and linter configuration
+├── .oxlintrc.json        # shared Oxlint rules
+├── .oxfmtrc.json         # shared Oxfmt rules
 ├── apps/
 │   ├── builder/          # icon build and generation scripts
 │   └── preview/          # React + TanStack Router preview app
@@ -159,30 +160,35 @@ The root workspace manages all Node packages. Use the root lockfile and avoid in
 
 ### Workspace Scripts
 
+Oxlint handles linting and Oxfmt handles formatting. The root configurations exclude generated icons, third-party UI primitives, and Avalonia files. `bun run check` applies lint fixes and formatting before checking package types; `bun run check:ci` validates without writing files. React Compiler-specific lint checks are disabled while the preview uses the regular React plugin. The recommended Oxc editor extension formats on save.
+
 The root scripts expose the main workspace tasks:
 
 ```bash
-pnpm run dev
-pnpm run build
-pnpm run deploy
-pnpm run check
-pnpm run sync
-pnpm run gen
-pnpm run gen -- svelte
-pnpm run gen -- react
-pnpm run gen -- avalonia
-pnpm run pack
+bun run dev
+bun run build
+bun run deploy
+bun run check
+bun run check:ci
+bun run lint
+bun run format
+bun run sync
+bun run gen
+bun run gen -- svelte
+bun run gen -- react
+bun run gen -- avalonia
+bun run pack
 ```
 
-`pnpm run deploy` builds the React preview app and deploys `apps/preview/dist` with Wrangler. The root `wrangler.jsonc` uses Workers Assets in static SPA mode, so unmatched navigation requests are served by `index.html`.
+`bun run deploy` builds the React preview app and deploys `apps/preview/dist` with Wrangler. The root `wrangler.jsonc` uses Workers Assets in static SPA mode, so unmatched navigation requests are served by `index.html`.
 
-`pnpm run gen` writes all generated package artifacts, including the preview icon metadata at `apps/preview/src/preview/icons.json`. Pass a generator name to limit output to one target.
+`bun run gen` writes all generated package artifacts, including the preview icon metadata at `apps/preview/src/preview/icons.json`. Pass a generator name to limit output to one target.
 
-`apps/builder` uses `tsx` for local CLI scripts, so generation commands run the TypeScript source directly while `build` still emits the published `dist` entry.
+`apps/builder` runs TypeScript source directly with Bun. Workspace packages are defined in the root `package.json`; `trustedDependencies` authorizes dependency install scripts, and `bunfig.toml` makes Bun the runtime for package scripts and their CLI tools.
 
 The React generator also writes the preview metadata used by `apps/preview`.
 
-`apps/preview` uses shadcn/ui with Tailwind CSS 4. The app-local UI primitives live in `apps/preview/src/components/ui`, are configured by `apps/preview/components.json`, and are installed with the shadcn CLI, for example `pnpm dlx shadcn@latest add button`.
+`apps/preview` uses shadcn/ui with Tailwind CSS 4. The app-local UI primitives live in `apps/preview/src/components/ui`, are configured by `apps/preview/components.json`, and are installed with the shadcn CLI, for example `bunx --bun shadcn@latest add button`.
 
 `apps/preview/src/styles.css` is reserved for Tailwind/shadcn imports, design tokens, base rules, and shared keyframes. Component-specific layout, state, and responsive styling belong in the relevant React component as Tailwind classes.
 

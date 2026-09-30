@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 
 import { generate } from './generate.js';
 import { avaloniaGenerator } from './generators/avalonia.js';

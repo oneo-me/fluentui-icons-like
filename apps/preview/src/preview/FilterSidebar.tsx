@@ -76,13 +76,11 @@ export function FilterSidebar({
         </div>
         <Button
           asChild
-          className="h-8 rounded-[7px] border border-[var(--preview-primary)] bg-[var(--preview-primary)] text-[11px] font-[760] text-[oklch(0.985_0.004_255)] no-underline transition-[filter,transform] duration-150 ease-out hover:-translate-y-px hover:bg-[var(--preview-primary)] hover:brightness-[1.08]"
-        >
+          className="h-8 rounded-[7px] border border-[var(--preview-primary)] bg-[var(--preview-primary)] text-[11px] font-[760] text-[oklch(0.985_0.004_255)] no-underline transition-[filter,transform] duration-150 ease-out hover:-translate-y-px hover:bg-[var(--preview-primary)] hover:brightness-[1.08]">
           <a
             href="https://github.com/oneo-me/fluentui-icons-like"
             target="_blank"
-            rel="noreferrer"
-          >
+            rel="noreferrer">
             Getting started
           </a>
         </Button>
@@ -97,8 +95,7 @@ export function FilterSidebar({
               variant="outline"
               size="xs"
               className={chipClass(selectedSize === size)}
-              onClick={() => onSelectSize(size)}
-            >
+              onClick={() => onSelectSize(size)}>
               {size}
             </Button>
           ))}
@@ -114,8 +111,7 @@ export function FilterSidebar({
               variant="outline"
               size="sm"
               className={chipClass(selectedStyle === style)}
-              onClick={() => onSelectStyle(style)}
-            >
+              onClick={() => onSelectStyle(style)}>
               {style}
             </Button>
           ))}
@@ -144,8 +140,7 @@ export function FilterSidebar({
               variant="outline"
               size="xs"
               className={metaphorChipClass(selectedMetaphor === '')}
-              onClick={() => onSelectMetaphor('')}
-            >
+              onClick={() => onSelectMetaphor('')}>
               All
             </Button>
             {visibleMetaphors.map((metaphor) => (
@@ -156,8 +151,7 @@ export function FilterSidebar({
                 size="xs"
                 className={metaphorChipClass(selectedMetaphor === metaphor)}
                 title={metaphor}
-                onClick={() => onSelectMetaphor(metaphor)}
-              >
+                onClick={() => onSelectMetaphor(metaphor)}>
                 {metaphor}
               </Button>
             ))}
@@ -171,8 +165,7 @@ export function FilterSidebar({
           href="https://oneo.me"
           target="_blank"
           rel="noreferrer"
-          className="font-[760] text-[var(--preview-primary-text)] no-underline hover:underline"
-        >
+          className="font-[760] text-[var(--preview-primary-text)] no-underline hover:underline">
           ONEO
         </a>{' '}
         using{' '}
@@ -180,8 +173,7 @@ export function FilterSidebar({
           href="https://github.com/microsoft/fluentui-system-icons"
           target="_blank"
           rel="noreferrer"
-          className="font-[760] text-[var(--preview-primary-text)] no-underline hover:underline"
-        >
+          className="font-[760] text-[var(--preview-primary-text)] no-underline hover:underline">
           fluentui-system-icons
         </a>
       </p>

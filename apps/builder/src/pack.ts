@@ -78,6 +78,7 @@ export function pack(): void {
   cleanPackArtifacts();
   fs.mkdirSync(PUBLISH_DIR, { recursive: true });
 
+  installWorkspaceDependencies();
   setNpmPackageVersions(version);
   setNugetPackageVersions(version);
 
@@ -133,13 +134,10 @@ function cleanPackArtifacts(): void {
 
 function setNpmPackageVersions(version: string): void {
   for (const npmPackage of npmPackages) {
-    const manifest = JSON.parse(
-      fs.readFileSync(npmPackage.manifestPath, 'utf8'),
-    ) as Record<string, unknown>;
-    manifest.version = version;
+    const manifestContent = fs.readFileSync(npmPackage.manifestPath, 'utf8');
     fs.writeFileSync(
       npmPackage.manifestPath,
-      `${JSON.stringify(manifest, null, 2)}\n`,
+      manifestContent.replace(/("version"\s*:\s*")[^"]+"/, `$1${version}"`),
     );
     console.log(`  Set ${npmPackage.name} version to ${version}`);
   }
@@ -152,11 +150,10 @@ function setNugetPackageVersions(version: string): void {
 
 function packNpmPackage(npmPackage: NpmPackage, version: string): string {
   console.log(`  Packing ${npmPackage.name}...`);
-  installNpmPackageDependencies(npmPackage);
   copyNpmPackageMetadata(npmPackage);
   removeNpmArchives(npmPackage);
   try {
-    execFileSync('pnpm', ['pack'], {
+    execFileSync('bun', ['pm', 'pack'], {
       cwd: npmPackage.directory,
       encoding: 'utf8',
       stdio: ['ignore', 'pipe', 'inherit'],
@@ -173,9 +170,9 @@ function packNpmPackage(npmPackage: NpmPackage, version: string): string {
   }
 }
 
-function installNpmPackageDependencies(npmPackage: NpmPackage): void {
-  execFileSync('pnpm', ['install', '--frozen-lockfile', '--ignore-scripts'], {
-    cwd: npmPackage.directory,
+function installWorkspaceDependencies(): void {
+  execFileSync('bun', ['install', '--frozen-lockfile', '--ignore-scripts'], {
+    cwd: ROOT_DIR,
     stdio: 'inherit',
   });
 }

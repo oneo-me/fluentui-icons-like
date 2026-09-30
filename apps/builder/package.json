@@ -8,13 +8,12 @@
   },
   "scripts": {
     "check": "tsc --noEmit -p tsconfig.json",
-    "sync": "tsx src/index.ts sync",
-    "generate": "tsx src/index.ts generate",
-    "pack": "tsx src/index.ts pack"
+    "sync": "bun src/index.ts sync",
+    "generate": "bun src/index.ts generate",
+    "pack": "bun src/index.ts pack"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
-    "tsx": "^4.23.12",
     "typescript": "^6.0.3"
   }
 }
