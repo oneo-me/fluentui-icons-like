@@ -1,20 +1,28 @@
 import { useNavigate, useSearch } from '@tanstack/react-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Button } from '#components/ui/button';
+import { Input } from '#components/ui/input';
+import logoUrl from '../../../../logo.png';
+import ChevronDownIcon from '../../../../packages/react/src/icons/FluentIconChevronDown';
 import { FilterSidebar } from './FilterSidebar';
 import { IconCatalog } from './IconCatalog';
 import { IconDetails } from './IconDetails';
+import {
+  getStoredPackageTab,
+  isPackageTabId,
+  setStoredPackageTab,
+} from './integration';
+import type { PackageTabId } from './integration';
 import type { PreviewIconEntry, PreviewIconStyle } from './registry';
 import { loadRegistry } from './registry';
 import type { PreviewSearch } from './search';
 import { searchKey, toUrlSearch } from './search';
 
 const defaultIconColor = '';
-const themeIconColor = 'var(--preview-foreground)';
-const validScales = new Set([1, 2, 3]);
 const appShellClassName =
-  'grid h-screen min-h-0 grid-cols-[236px_minmax(0,1fr)_282px] overflow-hidden bg-[var(--preview-background)] max-[980px]:grid-cols-[210px_minmax(0,1fr)] max-[760px]:grid-cols-1 max-[760px]:grid-rows-[auto_minmax(0,1fr)]';
+  'grid min-h-0 flex-1 grid-cols-[220px_minmax(0,1fr)_280px] overflow-hidden max-[980px]:grid-cols-[210px_minmax(0,1fr)] max-[760px]:grid-cols-1 max-[760px]:grid-rows-[auto_minmax(0,1fr)]';
 const loadingShellClassName =
-  'grid min-h-screen place-items-center content-center gap-3 text-[var(--preview-muted)]';
+  'grid min-h-dvh place-items-center content-center gap-3 text-muted-foreground';
 const loadingMarkClassName =
   'size-[38px] rounded-full border border-[var(--preview-border)] border-t-[var(--preview-primary)] motion-safe:animate-[spin_840ms_linear_infinite]';
 
@@ -28,8 +36,14 @@ export function PreviewApp() {
   const routeMetaphor = routeSearchState.metaphor ?? '';
   const routeIcon = routeSearchState.icon;
   const routeColor = routeSearchState.color ?? defaultIconColor;
-  const routeScale = getValidScale(routeSearchState.scale);
   const routeSearchKey = searchKey(routeSearchState);
+
+  const [activePackage, setActivePackage] =
+    useState<PackageTabId>(getStoredPackageTab);
+
+  useEffect(() => {
+    setStoredPackageTab(activePackage);
+  }, [activePackage]);
 
   const [source, setSource] = useState<PreviewIconEntry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,8 +56,6 @@ export function PreviewApp() {
     null,
   );
   const [selectedColor, setSelectedColor] = useState(routeColor);
-  const [selectedScale, setSelectedScale] = useState(routeScale);
-  const [themeColor, setThemeColor] = useState('oklch(0.332 0.018 255)');
   const [metaphorKeyword, setMetaphorKeyword] = useState('');
   const catalogScrollRef = useRef<HTMLDivElement | null>(null);
 
@@ -69,7 +81,6 @@ export function PreviewApp() {
     setSelectedStyle(routeStyle);
     setSelectedMetaphor(routeMetaphor);
     setSelectedColor(routeColor);
-    setSelectedScale(routeScale);
     if (source.length) {
       setSelectedIcon(
         routeIcon
@@ -84,31 +95,8 @@ export function PreviewApp() {
     routeMetaphor,
     routeIcon,
     routeColor,
-    routeScale,
     source,
   ]);
-
-  const syncThemeColor = useCallback(() => {
-    const color = getComputedStyle(document.documentElement)
-      .getPropertyValue('--preview-foreground')
-      .trim();
-    if (color) setThemeColor(color);
-  }, []);
-
-  useEffect(() => {
-    syncThemeColor();
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
-    const observer = new MutationObserver(syncThemeColor);
-    media.addEventListener('change', syncThemeColor);
-    observer.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ['class'],
-    });
-    return () => {
-      media.removeEventListener('change', syncThemeColor);
-      observer.disconnect();
-    };
-  }, [syncThemeColor]);
 
   const allSizes = useMemo(
     () =>
@@ -165,9 +153,6 @@ export function PreviewApp() {
     [leftFiltered, keyword],
   );
 
-  const effectiveSelectedColor = selectedColor || themeIconColor;
-  const colorPickerValue = selectedColor || themeColor;
-
   const resetScroll = useCallback(() => {
     if (catalogScrollRef.current) catalogScrollRef.current.scrollTop = 0;
   }, []);
@@ -222,7 +207,6 @@ export function PreviewApp() {
         metaphor: selectedMetaphor,
         icon: selectedIcon?.key,
         color: selectedColor,
-        scale: selectedScale,
       }),
     [
       keyword,
@@ -231,7 +215,6 @@ export function PreviewApp() {
       selectedMetaphor,
       selectedIcon,
       selectedColor,
-      selectedScale,
     ],
   );
 
@@ -257,62 +240,119 @@ export function PreviewApp() {
   }
 
   return (
-    <div className={appShellClassName}>
-      <FilterSidebar
-        iconCount={source.length}
-        allSizes={allSizes}
-        allStyles={allStyles}
-        visibleMetaphors={visibleMetaphors}
-        selectedSize={selectedSize}
-        selectedStyle={selectedStyle}
-        selectedMetaphor={selectedMetaphor}
-        metaphorKeyword={metaphorKeyword}
-        onMetaphorKeywordChange={setMetaphorKeyword}
-        onSelectSize={(size) => {
-          setSelectedSize(size);
-          resetScroll();
-        }}
-        onSelectStyle={(style) => {
-          setSelectedStyle(style);
-          resetScroll();
-        }}
-        onSelectMetaphor={(metaphor) => {
-          setSelectedMetaphor(metaphor);
-          resetScroll();
-        }}
-      />
+    <div className="flex h-dvh min-h-0 flex-col overflow-hidden bg-background">
+      <header className="flex flex-wrap items-center gap-2 border-b border-border px-3 py-2">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <img
+            src={logoUrl}
+            alt=""
+            className="size-8 shrink-0 object-contain"
+          />
+          <div className="min-w-0">
+            <h1 className="m-0 text-[17px] font-semibold leading-tight">
+              FluentUI Icons Like
+            </h1>
+          </div>
+        </div>
+        <label
+          className="relative ml-auto w-[300px] min-w-0 max-[900px]:order-last max-[900px]:ml-0 max-[900px]:w-full"
+          htmlFor="icon-search-input">
+          <span className="sr-only">Search icons</span>
+          <Input
+            id="icon-search-input"
+            className="h-10 pr-28"
+            type="search"
+            value={keyword}
+            placeholder="Search icons…"
+            onChange={(event) => {
+              setKeyword(event.currentTarget.value);
+              resetScroll();
+            }}
+          />
+          <output
+            className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs tabular-nums text-muted-foreground"
+            aria-live="polite">
+            {filtered.length.toLocaleString()} icons
+          </output>
+        </label>
+        <div className="flex items-center gap-2 max-[900px]:ml-auto max-[600px]:w-full max-[600px]:justify-end">
+          <label
+            className="relative text-xs font-medium"
+            htmlFor="integration-target">
+            <span className="sr-only">Framework</span>
+            <select
+              id="integration-target"
+              value={activePackage}
+              className="h-10 appearance-none rounded-md border border-input bg-card pr-9 pl-3 text-foreground shadow-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/22"
+              onChange={(event) => {
+                if (isPackageTabId(event.currentTarget.value))
+                  setActivePackage(event.currentTarget.value);
+              }}>
+              <option value="react">React</option>
+              <option value="svelte">Svelte</option>
+              <option value="avalonia">Avalonia</option>
+              <option value="wpf">WPF · Experimental</option>
+            </select>
+            <ChevronDownIcon
+              size={16}
+              title={null}
+              aria-hidden="true"
+              className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-muted-foreground"
+            />
+          </label>
+          <Button asChild className="h-10 no-underline">
+            <a
+              href="https://github.com/oneo-me/fluentui-icons-like"
+              target="_blank"
+              rel="noreferrer">
+              Getting started
+            </a>
+          </Button>
+        </div>
+      </header>
+      <div className={appShellClassName}>
+        <FilterSidebar
+          totalIconCount={source.length}
+          allSizes={allSizes}
+          allStyles={allStyles}
+          visibleMetaphors={visibleMetaphors}
+          selectedSize={selectedSize}
+          selectedStyle={selectedStyle}
+          selectedMetaphor={selectedMetaphor}
+          metaphorKeyword={metaphorKeyword}
+          onMetaphorKeywordChange={setMetaphorKeyword}
+          onSelectSize={(size) => {
+            setSelectedSize(size);
+            resetScroll();
+          }}
+          onSelectStyle={(style) => {
+            setSelectedStyle(style);
+            resetScroll();
+          }}
+          onSelectMetaphor={(metaphor) => {
+            setSelectedMetaphor(metaphor);
+            resetScroll();
+          }}
+        />
 
-      <IconCatalog
-        keyword={keyword}
-        leftFilteredCount={leftFiltered.length}
-        filtered={filtered}
-        selectedIcon={selectedIcon}
-        selectedSize={selectedSize}
-        selectedStyle={selectedStyle}
-        selectedColor={selectedColor}
-        effectiveSelectedColor={effectiveSelectedColor}
-        colorPickerValue={colorPickerValue}
-        selectedScale={selectedScale}
-        scrollRef={catalogScrollRef}
-        onKeywordChange={(value) => {
-          setKeyword(value);
-          resetScroll();
-        }}
-        onColorChange={setSelectedColor}
-        onSelectScale={(scale) => {
-          if (!validScales.has(scale)) return;
-          setSelectedScale(scale);
-          resetScroll();
-        }}
-        onSelectIcon={setSelectedIcon}
-      />
+        <IconCatalog
+          filtered={filtered}
+          selectedIcon={selectedIcon}
+          selectedSize={selectedSize}
+          selectedStyle={selectedStyle}
+          scrollRef={catalogScrollRef}
+          onSelectIcon={setSelectedIcon}
+        />
 
-      <IconDetails
-        selectedIcon={selectedIcon}
-        selectedSize={selectedSize}
-        selectedStyle={selectedStyle}
-        selectedColor={effectiveSelectedColor}
-      />
+        <IconDetails
+          activePackage={activePackage}
+          selectedIcon={selectedIcon}
+          selectedSize={selectedSize}
+          selectedStyle={selectedStyle}
+          pngColor={selectedColor}
+          onPngColorChange={setSelectedColor}
+        />
+      </div>
     </div>
   );
 }
@@ -340,8 +380,4 @@ function getSearchText(icon: PreviewIconEntry) {
 function matchesSearch(icon: PreviewIconEntry, keyword: string) {
   const terms = keyword.trim().toLowerCase().split(/\s+/).filter(Boolean);
   return terms.every((term) => getSearchText(icon).includes(term));
-}
-
-function getValidScale(scale: number | undefined) {
-  return validScales.has(scale ?? 1) ? (scale ?? 1) : 1;
 }

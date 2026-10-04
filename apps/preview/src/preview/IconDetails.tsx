@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { Button } from '#components/ui/button';
 import { cn } from '#lib/utils';
 import packageManifest from '../../../../package.json';
@@ -6,6 +6,7 @@ import ArrowDownloadIcon from '../../../../packages/react/src/icons/FluentIconAr
 import CodeIcon from '../../../../packages/react/src/icons/FluentIconCode';
 import CopyIcon from '../../../../packages/react/src/icons/FluentIconCopy';
 import ImageIcon from '../../../../packages/react/src/icons/FluentIconImage';
+import type { PackageTabId } from './integration';
 import { LazyIcon } from './LazyIcon';
 import type { PreviewIconEntry, PreviewIconStyle } from './registry';
 
@@ -13,7 +14,9 @@ interface IconDetailsProps {
   selectedIcon: PreviewIconEntry | null;
   selectedSize: number;
   selectedStyle: PreviewIconStyle;
-  selectedColor: string;
+  pngColor: string;
+  onPngColorChange: (color: string) => void;
+  activePackage: PackageTabId;
 }
 
 type SnippetId =
@@ -25,8 +28,10 @@ type SnippetId =
   | 'svelte'
   | 'avalonia-install'
   | 'avalonia-reference'
-  | 'avalonia';
-type PackageTabId = 'react' | 'svelte' | 'avalonia';
+  | 'avalonia'
+  | 'wpf-reference'
+  | 'wpf-namespace'
+  | 'wpf';
 
 const reactDefaultSize = 20;
 const reactDefaultStyle = 'Regular';
@@ -35,14 +40,13 @@ const svelteDefaultStyle = 'Regular';
 const avaloniaDefaultSize = 24;
 const avaloniaDefaultStyle = 'Regular';
 const packageVersion = packageManifest.version;
-const packageTabStorageKey = 'fluentui-icons-like:active-package-tab';
 const detailPanelClassName =
-  'relative min-h-0 min-w-0 overflow-hidden border-l border-[var(--preview-border)] bg-[var(--preview-background)] text-[var(--preview-foreground)] max-[980px]:hidden';
+  'relative min-h-0 min-w-0 overflow-hidden border-l border-border text-foreground max-[980px]:hidden';
 const detailScrollClassName = 'h-full overflow-y-auto';
 const emptyStateClassName =
   'grid min-h-[220px] place-items-center content-center gap-1.5 text-center text-[var(--preview-muted)]';
 const detailLabelClassName =
-  'text-[11px] font-[780] tracking-[0.08em] text-[var(--preview-muted)] uppercase';
+  'text-[11px] font-semibold tracking-[0.1em] text-muted-foreground uppercase';
 const detailValueClassName =
   'm-0 min-w-0 text-xs leading-[1.45] [overflow-wrap:anywhere]';
 const detailRowClassName =
@@ -54,46 +58,20 @@ const previewActionButtonClassName =
 const copyButtonClassName =
   'inline-grid size-7 flex-none cursor-pointer place-items-center rounded-[7px] border-0 bg-transparent transition-[background-color,color,box-shadow] duration-150 ease-out hover:bg-[var(--preview-primary-soft)] hover:text-[var(--preview-primary-text)]';
 const previewGridClassName =
-  'grid aspect-square w-full place-items-center bg-[var(--preview-background)] [background-image:linear-gradient(90deg,color-mix(in_oklab,var(--preview-primary)_10%,transparent)_1px,transparent_1px),linear-gradient(color-mix(in_oklab,var(--preview-primary)_10%,transparent)_1px,transparent_1px)] [background-position:4px_4px] [background-size:16px_16px]';
-const packageTabClassName =
-  'h-8 min-w-0 rounded-[7px] border border-transparent px-2 text-[11px] font-[740] text-[var(--preview-muted)] transition-[border-color,background-color,color,box-shadow] duration-150 ease-out hover:bg-[var(--preview-primary-soft)] hover:text-[var(--preview-primary-text)]';
-const packageTabActiveClassName =
-  'border-[color-mix(in_oklab,var(--preview-primary)_54%,var(--preview-border))] bg-[var(--preview-primary-soft)] text-[var(--preview-primary-text)] shadow-[inset_0_1px_0_color-mix(in_oklab,var(--preview-primary)_12%,transparent)]';
-const packageTabs: Array<{
-  id: PackageTabId;
-  label: string;
-}> = [
-  {
-    id: 'react',
-    label: 'React',
-  },
-  {
-    id: 'svelte',
-    label: 'Svelte',
-  },
-  {
-    id: 'avalonia',
-    label: 'Avalonia',
-  },
-];
-
+  'grid aspect-square w-full place-items-center bg-background [background-image:radial-gradient(var(--preview-border)_1px,transparent_1px)] [background-size:16px_16px]';
 export function IconDetails({
   selectedIcon,
   selectedSize,
   selectedStyle,
-  selectedColor,
+  pngColor,
+  onPngColorChange,
+  activePackage,
 }: IconDetailsProps) {
   const sourcePreviewRef = useRef<HTMLDivElement | null>(null);
   const [copiedName, setCopiedName] = useState('');
   const [copiedSvg, setCopiedSvg] = useState(false);
   const [copiedSnippet, setCopiedSnippet] = useState<SnippetId | ''>('');
-  const [activePackage, setActivePackage] =
-    useState<PackageTabId>(getStoredPackageTab);
   const [pulse, setPulse] = useState(0);
-
-  useEffect(() => {
-    setStoredPackageTab(activePackage);
-  }, [activePackage]);
 
   if (!selectedIcon) {
     return (
@@ -167,7 +145,7 @@ export function IconDetails({
     return `${icon.key}_${selectedSize}_${selectedStyle.toLowerCase()}.${extension}`;
   }
 
-  function getSvgCode() {
+  function getSvgCode(exportColor?: string) {
     const svg = sourcePreviewRef.current?.querySelector('svg');
     if (!svg) return '';
 
@@ -175,8 +153,9 @@ export function IconDetails({
     clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
     clone.setAttribute('width', String(selectedSize));
     clone.setAttribute('height', String(selectedSize));
-    clone.setAttribute('color', selectedColor);
-    clone.style.cssText = `color: ${selectedColor}`;
+    const color = exportColor ?? getComputedStyle(svg).color;
+    clone.setAttribute('color', color);
+    clone.style.cssText = `color: ${color}`;
 
     return new XMLSerializer().serializeToString(clone);
   }
@@ -200,7 +179,7 @@ export function IconDetails({
   }
 
   async function downloadPng() {
-    const svgCode = getSvgCode();
+    const svgCode = getSvgCode(pngColor || '#000000');
     if (!svgCode) return;
 
     const exportSize = Math.max(256, selectedSize * 8);
@@ -243,9 +222,7 @@ export function IconDetails({
   return (
     <aside className={detailPanelClassName} aria-label="Selected icon details">
       <div className={detailScrollClassName}>
-        <div
-          className="grid overflow-hidden border-b border-[var(--preview-border)] bg-[var(--preview-panel-strong)]"
-          style={{ color: selectedColor }}>
+        <div className="m-3 grid overflow-hidden rounded-lg border border-border bg-card shadow-sm">
           <div className={previewGridClassName}>
             <LazyIcon
               icon={icon}
@@ -297,13 +274,48 @@ export function IconDetails({
               <span>Code</span>
             </Button>
           </div>
+          <div className="grid gap-2 border-t border-border p-3">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-xs font-medium">PNG color</span>
+              <Button
+                variant="ghost"
+                size="xs"
+                disabled={!pngColor}
+                onClick={() => onPngColorChange('')}>
+                Reset
+              </Button>
+            </div>
+            <label className="flex cursor-pointer items-center gap-2 rounded-md border border-input bg-background px-2 py-1.5 focus-within:ring-3 focus-within:ring-ring/22">
+              <span
+                className="relative size-6 shrink-0 overflow-hidden rounded-sm border border-border"
+                style={{ backgroundColor: pngColor || '#000000' }}>
+                <input
+                  type="color"
+                  className="absolute inset-0 size-full cursor-pointer opacity-0"
+                  value={pngColor || '#000000'}
+                  aria-label="PNG export color"
+                  onChange={(event) =>
+                    onPngColorChange(event.currentTarget.value)
+                  }
+                />
+              </span>
+              <span className="font-mono text-xs">
+                {(pngColor || '#000000').toUpperCase()}
+              </span>
+              <span className="ml-auto text-[11px] text-muted-foreground">
+                Choose color
+              </span>
+            </label>
+            <p className="m-0 text-[11px] text-muted-foreground">
+              Only affects PNG downloads.
+            </p>
+          </div>
         </div>
 
         <div
           className="pointer-events-none absolute size-0 overflow-hidden opacity-0"
           aria-hidden="true"
-          ref={sourcePreviewRef}
-          style={{ color: selectedColor }}>
+          ref={sourcePreviewRef}>
           <LazyIcon
             icon={icon}
             size={selectedSize}
@@ -313,31 +325,14 @@ export function IconDetails({
         </div>
 
         <div className="grid gap-2 border-b border-[var(--preview-border)] px-2.5 py-2.5">
-          <div
-            className="grid grid-cols-3 gap-1"
-            role="tablist"
-            aria-label="Package usage">
-            {packageTabs.map((tab) => (
-              <Button
-                key={tab.id}
-                type="button"
-                variant="ghost"
-                role="tab"
-                id={`${tab.id}-usage-tab`}
-                aria-selected={activePackage === tab.id}
-                aria-controls={`${tab.id}-usage-panel`}
-                className={cn(
-                  packageTabClassName,
-                  activePackage === tab.id && packageTabActiveClassName,
-                )}
-                onClick={() => setActivePackage(tab.id)}>
-                {tab.label}
-              </Button>
-            ))}
-          </div>
-
           <PackageUsagePanel
             activePackage={activePackage}
+            wpfReferenceSnippet={buildAvaloniaReferenceSnippet(avaloniaSymbol)}
+            wpfIconSnippet={buildAvaloniaIconSnippet(
+              avaloniaSymbol,
+              selectedSize,
+              selectedStyle,
+            )}
             reactInstallSnippet={reactInstallSnippet}
             reactImportSnippet={reactImportSnippet}
             reactIconSnippet={reactIconSnippet}
@@ -353,7 +348,7 @@ export function IconDetails({
           />
         </div>
 
-        <dl className="m-0 grid px-2.5 pb-3">
+        <dl className="m-0 grid px-4 pb-4">
           <DetailValue
             label="Name"
             value={icon.name}
@@ -427,31 +422,10 @@ function splitKeywords(keyword: string) {
     .filter(Boolean);
 }
 
-function getStoredPackageTab(): PackageTabId {
-  if (typeof window === 'undefined') return 'react';
-
-  try {
-    const storedTab = window.localStorage.getItem(packageTabStorageKey);
-    return isPackageTabId(storedTab) ? storedTab : 'react';
-  } catch {
-    return 'react';
-  }
-}
-
-function setStoredPackageTab(tab: PackageTabId) {
-  try {
-    window.localStorage.setItem(packageTabStorageKey, tab);
-  } catch {
-    return;
-  }
-}
-
-function isPackageTabId(value: string | null): value is PackageTabId {
-  return value === 'react' || value === 'svelte' || value === 'avalonia';
-}
-
 function PackageUsagePanel({
   activePackage,
+  wpfReferenceSnippet,
+  wpfIconSnippet,
   reactInstallSnippet,
   reactImportSnippet,
   reactIconSnippet,
@@ -466,6 +440,8 @@ function PackageUsagePanel({
   onCopy,
 }: {
   activePackage: PackageTabId;
+  wpfReferenceSnippet: string;
+  wpfIconSnippet: string;
   reactInstallSnippet: string;
   reactImportSnippet: string;
   reactIconSnippet: string;
@@ -480,11 +456,31 @@ function PackageUsagePanel({
   onCopy: (text: string, kind: SnippetId, value?: string) => void;
 }) {
   return (
-    <section
-      role="tabpanel"
-      id={`${activePackage}-usage-panel`}
-      aria-labelledby={`${activePackage}-usage-tab`}
-      className="grid gap-2">
+    <section aria-label={`${activePackage} integration`} className="grid gap-2">
+      <h3 className="m-0 text-xs font-semibold">
+        {activePackage === 'wpf'
+          ? 'WPF · Experimental'
+          : activePackage === 'react'
+            ? 'React'
+            : activePackage === 'svelte'
+              ? 'Svelte'
+              : 'Avalonia'}{' '}
+        integration
+      </h3>
+      {activePackage === 'wpf' ? (
+        <p className="m-0 text-xs leading-relaxed text-muted-foreground">
+          WPF is experimental, source-only, and excluded from automatic
+          publication. Known build limitations remain; Windows verification is
+          required.{' '}
+          <a
+            className="text-[var(--preview-primary-text)] underline"
+            href="https://github.com/oneo-me/fluentui-icons-like/tree/main/packages/wpf"
+            target="_blank"
+            rel="noreferrer">
+            View source
+          </a>
+        </p>
+      ) : null}
       <dl className="m-0 grid">
         {activePackage === 'react' ? (
           <>
@@ -562,6 +558,38 @@ function PackageUsagePanel({
               copied={copiedSnippet === 'avalonia'}
               pulse={pulse}
               onCopy={() => onCopy(avaloniaIconSnippet, 'avalonia')}
+            />
+          </>
+        ) : null}
+        {activePackage === 'wpf' ? (
+          <>
+            <SnippetRow
+              label="XAML namespace"
+              snippet={
+                'xmlns:icons="clr-namespace:FluentUIIconsLike;assembly=FluentUIIconsLike"'
+              }
+              copied={copiedSnippet === 'wpf-namespace'}
+              pulse={pulse}
+              onCopy={() =>
+                onCopy(
+                  'xmlns:icons="clr-namespace:FluentUIIconsLike;assembly=FluentUIIconsLike"',
+                  'wpf-namespace',
+                )
+              }
+            />
+            <SnippetRow
+              label="Reference"
+              snippet={wpfReferenceSnippet}
+              copied={copiedSnippet === 'wpf-reference'}
+              pulse={pulse}
+              onCopy={() => onCopy(wpfReferenceSnippet, 'wpf-reference')}
+            />
+            <SnippetRow
+              label="Use"
+              snippet={wpfIconSnippet}
+              copied={copiedSnippet === 'wpf'}
+              pulse={pulse}
+              onCopy={() => onCopy(wpfIconSnippet, 'wpf')}
             />
           </>
         ) : null}

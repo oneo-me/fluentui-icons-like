@@ -5,10 +5,8 @@ export interface PreviewSearch {
   metaphor?: string;
   icon?: string;
   color?: string;
-  scale?: number;
 }
 
-const validScales = new Set([1, 2, 3]);
 const hexColorRe = /^#[0-9a-f]{6}$/i;
 
 export function sanitizeSearch(search: Record<string, unknown>): PreviewSearch {
@@ -19,7 +17,6 @@ export function sanitizeSearch(search: Record<string, unknown>): PreviewSearch {
   const metaphor = readString(search.metaphor).trim();
   const icon = readString(search.icon).trim();
   const color = readString(search.color).trim();
-  const scale = readNumber(search.scale);
 
   if (q) next.q = q;
   if (size > 0) next.size = size;
@@ -27,7 +24,6 @@ export function sanitizeSearch(search: Record<string, unknown>): PreviewSearch {
   if (metaphor) next.metaphor = metaphor;
   if (icon) next.icon = icon;
   if (hexColorRe.test(color)) next.color = color.toLowerCase();
-  if (validScales.has(scale)) next.scale = scale;
 
   return next;
 }
@@ -53,7 +49,6 @@ export function toUrlSearch(search: PreviewSearch): PreviewSearch {
   if (search.metaphor) next.metaphor = search.metaphor;
   if (search.icon) next.icon = search.icon;
   if (search.color) next.color = search.color;
-  if (search.scale && search.scale !== 1) next.scale = search.scale;
   return next;
 }
 
