@@ -19,7 +19,9 @@
 - Size, style, and metaphor filters apply before text search.
 - If the current selection leaves the result set, the first result is selected. An empty set has a visible empty state.
 
-Search, size, style, metaphor, selected icon, and PNG export color (the existing `color` parameter) are synchronized to URL query parameters. [Query validation](../../apps/preview/src/preview/search.ts) accepts positive sizes and six-digit hex colors. Defaults are omitted when serializing. Legacy `scale` parameters are ignored; display scaling is not supported.
+Size, style, metaphor, and selected icon are synchronized to URL query parameters. [Query validation](../../apps/preview/src/preview/search.ts) accepts positive sizes. Defaults are omitted when serializing. Legacy `q`, `color`, and `scale` parameters are ignored; search and PNG color are local preferences, and display scaling is not supported.
+
+[Preferences](../../apps/preview/src/preview/preferences.ts) store the search keyword under `fluentui-icons-like:search-keyword` and PNG export color under `fluentui-icons-like:png-color` in localStorage. PreviewApp restores these through lazy state initialization and saves changes independently of URL navigation. Empty values remove their stored key. Invalid colors fall back to the default black PNG color; unavailable storage falls back to an empty keyword/default color without preventing in-memory changes. Shared links do not carry either preference.
 
 The global framework selector in the page header is owned by PreviewApp and passed to IconDetails. It offers React, Svelte, Avalonia, and experimental WPF. The choice is stored separately in localStorage using the existing `fluentui-icons-like:active-package-tab` key; it is a browser preference, not shareable query state. Invalid values or unavailable storage fall back to React without preventing selection.
 
@@ -53,6 +55,6 @@ Shared styles belong in [styles.css](../../apps/preview/src/styles.css); compone
 
 ## Verification
 
-Use `bun run check:ci` and `bun run build` for static validation. Manual acceptance should cover shareable URLs, invalid query values, long metadata, large asset sizes, live search-field counts, a stable footer total, ignored legacy `scale` parameters, empty results, lazy loading, clipboard permissions, SVG/PNG transparency, PNG-only color isolation (including legacy `color` URLs, reset, and theme changes), and persisted framework selection, all four framework examples, invalid/unavailable localStorage, and the experimental WPF warning.
+Use `bun run check:ci` and `bun run build` for static validation. Manual acceptance should cover shareable filter/selection URLs, local search and PNG-color restoration after refresh, cleared preferences, invalid stored colors, unavailable storage, ignored legacy `q`/`color` parameters, invalid query values, long metadata, large asset sizes, live search-field counts, a stable footer total, ignored legacy `scale` parameters, empty results, lazy loading, clipboard permissions, SVG/PNG transparency, PNG-only color isolation (including legacy `color` URLs, reset, and theme changes), and persisted framework selection, all four framework examples, invalid/unavailable localStorage, and the experimental WPF warning.
 
 Check wide, 980px, and 760px layouts in both themes. Controls need accessible labels and visible keyboard focus; selection, loading, copying, and disabled states must not rely on color alone. Verify reduced-motion behavior and text/border contrast manually rather than inferring accessibility acceptance from a successful build.

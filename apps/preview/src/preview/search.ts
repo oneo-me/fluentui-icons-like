@@ -1,29 +1,21 @@
 export interface PreviewSearch {
-  q?: string;
   size?: number;
   style?: string;
   metaphor?: string;
   icon?: string;
-  color?: string;
 }
-
-const hexColorRe = /^#[0-9a-f]{6}$/i;
 
 export function sanitizeSearch(search: Record<string, unknown>): PreviewSearch {
   const next: PreviewSearch = {};
-  const q = readString(search.q).trim();
   const size = readNumber(search.size);
   const style = readString(search.style).trim();
   const metaphor = readString(search.metaphor).trim();
   const icon = readString(search.icon).trim();
-  const color = readString(search.color).trim();
 
-  if (q) next.q = q;
   if (size > 0) next.size = size;
   if (style) next.style = style;
   if (metaphor) next.metaphor = metaphor;
   if (icon) next.icon = icon;
-  if (hexColorRe.test(color)) next.color = color.toLowerCase();
 
   return next;
 }
@@ -43,12 +35,10 @@ export function readNumber(value: unknown): number {
 
 export function toUrlSearch(search: PreviewSearch): PreviewSearch {
   const next: PreviewSearch = {};
-  if (search.q) next.q = search.q;
   if (search.size && search.size !== 20) next.size = search.size;
   if (search.style && search.style !== 'Regular') next.style = search.style;
   if (search.metaphor) next.metaphor = search.metaphor;
   if (search.icon) next.icon = search.icon;
-  if (search.color) next.color = search.color;
   return next;
 }
 

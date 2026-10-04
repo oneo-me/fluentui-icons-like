@@ -47,7 +47,7 @@ Supported packages
 
 Generation owns derived files; downstream packages do not modify upstream definitions. Web components select a fallback source when a requested combination is absent. Avalonia and WPF require an exact variant from explicitly referenced data.
 
-Preview query state belongs to the URL; the global framework selection belongs to browser localStorage. Neither changes package contents. Automated release recovery state belongs to a GitHub Release draft and its original archives.
+Preview size/style/metaphor filters and icon selection belong to the URL; the search keyword, PNG export color, and global framework selection belong to browser localStorage. Neither changes package contents. Automated release recovery state belongs to a GitHub Release draft and its original archives.
 
 ## Repository layout
 

@@ -13,12 +13,17 @@ import {
   setStoredPackageTab,
 } from './integration';
 import type { PackageTabId } from './integration';
+import {
+  getStoredKeyword,
+  getStoredPngColor,
+  setStoredKeyword,
+  setStoredPngColor,
+} from './preferences';
 import type { PreviewIconEntry, PreviewIconStyle } from './registry';
 import { loadRegistry } from './registry';
 import type { PreviewSearch } from './search';
 import { searchKey, toUrlSearch } from './search';
 
-const defaultIconColor = '';
 const appShellClassName =
   'grid min-h-0 flex-1 grid-cols-[220px_minmax(0,1fr)_280px] overflow-hidden max-[980px]:grid-cols-[210px_minmax(0,1fr)] max-[760px]:grid-cols-1 max-[760px]:grid-rows-[auto_minmax(0,1fr)]';
 const loadingShellClassName =
@@ -30,12 +35,10 @@ export function PreviewApp() {
   const routeSearch = useSearch({ from: '/' });
   const navigate = useNavigate({ from: '/' });
   const routeSearchState = routeSearch as PreviewSearch;
-  const routeKeyword = routeSearchState.q ?? '';
   const routeSize = routeSearchState.size ?? 20;
   const routeStyle = routeSearchState.style ?? 'Regular';
   const routeMetaphor = routeSearchState.metaphor ?? '';
   const routeIcon = routeSearchState.icon;
-  const routeColor = routeSearchState.color ?? defaultIconColor;
   const routeSearchKey = searchKey(routeSearchState);
 
   const [activePackage, setActivePackage] =
@@ -47,7 +50,7 @@ export function PreviewApp() {
 
   const [source, setSource] = useState<PreviewIconEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [keyword, setKeyword] = useState(routeKeyword);
+  const [keyword, setKeyword] = useState(getStoredKeyword);
   const [selectedSize, setSelectedSize] = useState(routeSize);
   const [selectedStyle, setSelectedStyle] =
     useState<PreviewIconStyle>(routeStyle);
@@ -55,7 +58,15 @@ export function PreviewApp() {
   const [selectedIcon, setSelectedIcon] = useState<PreviewIconEntry | null>(
     null,
   );
-  const [selectedColor, setSelectedColor] = useState(routeColor);
+  const [selectedColor, setSelectedColor] = useState(getStoredPngColor);
+
+  useEffect(() => {
+    setStoredKeyword(keyword);
+  }, [keyword]);
+
+  useEffect(() => {
+    setStoredPngColor(selectedColor);
+  }, [selectedColor]);
   const [metaphorKeyword, setMetaphorKeyword] = useState('');
   const catalogScrollRef = useRef<HTMLDivElement | null>(null);
 
@@ -76,11 +87,9 @@ export function PreviewApp() {
   }, [routeIcon]);
 
   useEffect(() => {
-    setKeyword(routeKeyword);
     setSelectedSize(routeSize);
     setSelectedStyle(routeStyle);
     setSelectedMetaphor(routeMetaphor);
-    setSelectedColor(routeColor);
     if (source.length) {
       setSelectedIcon(
         routeIcon
@@ -88,15 +97,7 @@ export function PreviewApp() {
           : (source[0] ?? null),
       );
     }
-  }, [
-    routeKeyword,
-    routeSize,
-    routeStyle,
-    routeMetaphor,
-    routeIcon,
-    routeColor,
-    source,
-  ]);
+  }, [routeSize, routeStyle, routeMetaphor, routeIcon, source]);
 
   const allSizes = useMemo(
     () =>
@@ -201,21 +202,12 @@ export function PreviewApp() {
   const nextSearch = useMemo(
     () =>
       toUrlSearch({
-        q: keyword,
         size: selectedSize,
         style: selectedStyle,
         metaphor: selectedMetaphor,
         icon: selectedIcon?.key,
-        color: selectedColor,
       }),
-    [
-      keyword,
-      selectedSize,
-      selectedStyle,
-      selectedMetaphor,
-      selectedIcon,
-      selectedColor,
-    ],
+    [selectedSize, selectedStyle, selectedMetaphor, selectedIcon],
   );
 
   useEffect(() => {
