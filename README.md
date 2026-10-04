@@ -8,7 +8,7 @@
 
 ## Packages
 
-| Package                            | Ecosystem | Status                                                                            |
+| Package                            | Ecosystem | Version                                                                           |
 | ---------------------------------- | --------- | --------------------------------------------------------------------------------- |
 | `@oneo/fluentui-icons-like`        | npm       | ![npm version](https://img.shields.io/npm/v/%40oneo%2Ffluentui-icons-like)        |
 | `@oneo/fluentui-icons-like-react`  | npm       | ![npm version](https://img.shields.io/npm/v/%40oneo%2Ffluentui-icons-like-react)  |
@@ -153,7 +153,12 @@ The root workspace manages all Node packages. Use the root lockfile and avoid in
 ├── packages/
 │   ├── svelte/           # Svelte package
 │   ├── react/            # React package
-│   └── avalonia/         # Avalonia library, generator, and demo
+│   ├── avalonia/         # Avalonia library, generator, and demo
+│   └── wpf/              # experimental WPF library, generator, and demo
+├── docs/architecture/    # mechanism-specific documentation
+├── AGENTS.md             # contributor instructions
+├── ARCHITECTURE.md       # system overview and subject index
+├── CHANGELOG.md          # user-facing release notes
 ├── README.md
 └── LICENSE
 ```
@@ -215,10 +220,14 @@ The preview is built as a validation step; Cloudflare deployment remains indepen
 
 [GitHub scheduled workflows](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule) can be delayed and are disabled in public repositories after 60 days without repository activity. This automation therefore depends on the schedule remaining enabled; it is not an exact-time timer. Run `bun run test` to check interval, version selection, metadata validation, draft recovery, registry failures, and publication requests against mocked services without publishing.
 
-### WPF Branch
+### Experimental WPF Support
 
-The `feat/wpf` branch includes the WPF runtime, source generator, and demo under `packages/wpf`. Generate its icon data with `bun run gen -- wpf`. The default generation, packing, and automatic release workflow still target Svelte, React, and Avalonia; WPF is not included in automatic publication. Building and running the WPF demo requires Windows.
+This repository includes an experimental WPF runtime, source generator, and demo under `packages/wpf`. Generate its icon data with `bun run gen -- wpf`. Default generation, packing, and automatic releases still target Svelte, React, and Avalonia; WPF is not automatically published. Known compilation limitations and Windows validation requirements are documented in [WPF package](docs/architecture/wpf-package.md).
 
 ## License
 
 MIT
+
+## Project Documentation
+
+Read [Architecture](ARCHITECTURE.md) for the system overview and subject index. See [Project Documentation](docs/README.md) for navigation, [Contributor Instructions](AGENTS.md) for maintenance rules, and [Changelog](CHANGELOG.md) for release notes.
