@@ -6,18 +6,18 @@
 
 :root {
   color-scheme: light;
-  --preview-background: #fcfbf9;
-  --preview-foreground: #33332f;
-  --preview-panel: #eceae4;
-  --preview-panel-strong: #fefefd;
-  --preview-muted: #67675f;
-  --preview-border: #deded5;
-  --preview-border-strong: #cfcec5;
-  --preview-primary: #bd481b;
-  --preview-primary-soft: #ffeadf;
-  --preview-primary-text: #703019;
+  --preview-background: #ffffff;
+  --preview-foreground: #253044;
+  --preview-panel: #f3f6fb;
+  --preview-panel-strong: #ffffff;
+  --preview-muted: #606d80;
+  --preview-border: #e0e6ef;
+  --preview-border-strong: #cbd5e3;
+  --preview-primary: #2563eb;
+  --preview-primary-soft: #eaf2ff;
+  --preview-primary-text: #1e4fa8;
   --preview-success: #059669;
-  --preview-shadow: rgb(48 47 40 / 0.08);
+  --preview-shadow: rgb(30 55 90 / 0.08);
   --preview-font-sans:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   --preview-font-mono:
@@ -44,7 +44,7 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: var(--preview-border);
   --input: var(--preview-border-strong);
-  --ring: #b94716;
+  --ring: var(--preview-primary);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
